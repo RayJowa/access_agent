@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "606957447439",
+    "firebase_url": "https://access-8eaac.firebaseio.com",
+    "project_id": "access-8eaac",
+    "storage_bucket": "access-8eaac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606957447439:android:602ea41931f0f4395af67a",
+        "android_client_info": {
+          "package_name": "com.zimbytes.access_agent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "606957447439-spgu2hnjk5pmp6dbfpet25hei6esa8i1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHSwgyRm9OnMrYaSlAT9jRLmKWjfz6a8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "606957447439-spgu2hnjk5pmp6dbfpet25hei6esa8i1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

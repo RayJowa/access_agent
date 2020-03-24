@@ -1,0 +1,21 @@
+import 'package:access_agent/models/user.dart';
+import 'package:access_agent/screens/authenticate/authenticate.dart';
+import 'package:access_agent/screens/wrapper.dart';
+import 'package:access_agent/services/auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return StreamProvider<User>.value(
+      value: AuthService().user,
+      child: MaterialApp(
+        home: Wrapper(),
+      ),
+    );
+  }
+}
