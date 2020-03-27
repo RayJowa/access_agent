@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:access_agent/models/dependent.dart';
 import 'package:access_agent/models/policy.dart';
@@ -6,9 +5,11 @@ import 'package:access_agent/screens/add_policy/add_dependent_view.dart';
 import 'package:access_agent/screens/add_policy/doctor_view.dart';
 import 'package:access_agent/screens/add_policy/previous_medical_aid_view.dart';
 import 'package:access_agent/services/database.dart';
+import 'package:access_agent/shared/custom_button.dart';
 import 'package:access_agent/shared/loading.dart';
 import 'package:access_agent/shared/slide_left.dart';
 import 'package:access_agent/shared/slide_right.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -39,19 +40,8 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
 
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Add dependants',
-          style: TextStyle(
-              color: Colors.grey[700],
-              fontSize: 25,
-              fontWeight: FontWeight.w500
-          ),
-        ),
-        centerTitle: false,
-        backgroundColor: Colors.grey[100],
-        elevation: 0,
-      ),
+      backgroundColor: Theme.of(context).accentColor,
+
       body: FutureBuilder(
 
           future: packages,
@@ -155,138 +145,215 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
 
                 chronicAddOn = widget.policy.dependents.fold(0, (p, e) => p + e.chronicAddOnAmount);
               }
-              return Column(
+              return SafeArea(
+                child: Stack(
                   children: <Widget>[
-                    Flexible(
-                      child: ListView.builder(
-                          itemCount: widget.policy.dependents.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Dismissible(
-                              key: Key(index.toString()),
-                              child: InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context:context,
-                                    builder: (BuildContext context) {
-                                      return SimpleDialog(
-                                        title: Text('${widget.policy.dependents[index].firstName} ${widget.policy.dependents[index].surname}'),
-                                        children: <Widget>[
-                                          Text('Date of birth - ${DateFormat.yMMMMd("en_US").format(widget.policy.dependents[index].dob)}'),
-                                          Text('ID Number - ${widget.policy.dependents[index].idNumber}'),
-                                          Text('Gender - ${widget.policy.dependents[index].gender}'),
-                                          Text('Doctor - ${widget.policy.dependents[index].doctor['name']}'),
-                                          Text('Basic premium - ${widget.policy.dependents[index].monthlyPremium.toString()}')
-                                        ],
-                                      );
-                                    }
-                                  );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30.0)
-                                  ),
-                                  elevation: 1,
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: Colors.amberAccent,
-                                      backgroundImage: AssetImage('assets/images/${widget.policy.dependents[index].package.toLowerCase()}.png'),
-                                    ),
-                                    title: Text('${widget.policy.dependents[index]
-                                        .firstName} ${widget.policy
-                                        .dependents[index].surname}'),
-                                    subtitle: Text(
-                                        '${widget.policy.dependents[index]
-                                            .idNumber}  DOB ${widget.policy
-                                            .dependents[index].dob.toLocal()
-                                            .toString()}'),
-                                    trailing: Text(
-                                        '\$${widget.policy.dependents[index]
-                                            .monthlyPremium}'),
-                                  ),
-                                ),
-                              ),
-                              background: slideRightBackground(),
-                              secondaryBackground: slideLeftBackground(),
-                              confirmDismiss: (direction) async {
-                                if (direction == DismissDirection.endToStart) {
-                                  final bool res = await showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Text('Are you sure you want to remove'),
-                                            Text(
-                                              '${widget.policy.dependents[index].firstName} ${widget.policy.dependents[index].surname}',
-                                              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w700),
-                                            )
-                                          ],
-                                        ),
-                                        actions: <Widget>[
-                                          FlatButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text(
-                                                'Cancel',
-                                                style: TextStyle(color: Colors.grey[800]),
-                                              ),
-                                          ),
-                                          FlatButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  widget.policy.dependents.removeAt(index);
-                                                });
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text(
-                                                'Delete',
-                                                style: TextStyle(color: Colors.red),
-                                              )
-                                          )
-                                        ],
-                                      );
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      left: 0,
+                      child: DependentViewSummary(
+                        policy: widget.policy,
+                        netTotal: policyTotal,
+                        joiningFee: joiningFee,
+                        chronicAddOn: chronicAddOn,
+                        customOnPressed: () async {
 
-                                    }
-                                  );
-                                  return res;
-                                }else{
+                          dynamic result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => AddPolicyAddDependentView())
+                          );
+
+                          if (result != null) {
+                            setState(() {
+                              widget.policy.dependents.add(result);
+                            });
+                          }
+
+                        },
+                      ),
+                    ),
+                    Positioned(
+                      top: 165,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: SingleChildScrollView(
+                          physics: ScrollPhysics(),
+                          child: Column(
+                            children: <Widget>[
+                              ListView.builder(
+                                        itemCount: widget.policy.dependents.length,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          return Dismissible(
+                                            key: Key(index.toString()),
+                                            child: DependantCard(
+                                              index: index,
+                                              dependent: widget.policy.dependents[index],
+                                            ),
+                                            background: slideRightBackground(),
+                                            secondaryBackground: slideLeftBackground(),
+                                            confirmDismiss: (direction) async {
+                                              if (direction == DismissDirection.endToStart) {
+                                                final bool res = await showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return AlertDialog(
+                                                        content: Column(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: <Widget>[
+                                                            Text('Are you sure you want to remove'),
+                                                            Text(
+                                                              '${widget.policy.dependents[index].firstName} ${widget.policy.dependents[index].surname}',
+                                                              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w700),
+                                                            )
+                                                          ],
+                                                        ),
+                                                        actions: <Widget>[
+                                                          FlatButton(
+                                                            onPressed: () {
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            child: Text(
+                                                              'Cancel',
+                                                              style: TextStyle(color: Colors.grey[800]),
+                                                            ),
+                                                          ),
+                                                          FlatButton(
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  widget.policy.dependents.removeAt(index);
+                                                                });
+                                                                Navigator.of(context).pop();
+                                                              },
+                                                              child: Text(
+                                                                'Delete',
+                                                                style: TextStyle(color: Colors.red),
+                                                              )
+                                                          )
+                                                        ],
+                                                      );
+
+                                                    }
+                                                );
+                                                return res;
+                                              }else{
+
+                                                dynamic result = await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => AddPolicyAddDependentView(dep: widget.policy.dependents[index],))
+                                                );
+
+                                                if (result != null) {
+                                                  setState(() {
+                                                    widget.policy.dependents[index] = result;
+                                                  });
+                                                }
+
+                                                return null;
+                                              }
+                                            },
+                                          );
+                                        }
+                                    ),
+                              InkWell (
+                                onTap: () async {
 
                                   dynamic result = await Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => AddPolicyAddDependentView(dep: widget.policy.dependents[index],))
+                                      MaterialPageRoute(builder: (context) => AddPolicyAddDependentView())
                                   );
 
                                   if (result != null) {
                                     setState(() {
-                                      widget.policy.dependents[index] = result;
+                                      widget.policy.dependents.add(result);
                                     });
                                   }
 
-                                  return null;
-                                }
-                              },
-                            );
-                          }
-                      ),
-                    ),
-                    SizedBox(height: 20.0,),
-                    Text('Net - ${policyTotal.toString()}, Join - ${joiningFee.toString()}, Chronic - ${chronicAddOn.toString()}'),
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 21.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  padding: EdgeInsets.all(12),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Material(
+                                        color: Colors.white,
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(Icons.add),
+                                            onPressed: () async {
 
-                    FlatButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) =>
-                                  AddPolicyPreviousMedicalAidView(policy: widget
-                                      .policy,))
-                          );
-                        },
-                        icon: Icon(Icons.navigate_next),
-                        label: Text('Next')
-                    )
-                  ]
+                                              dynamic result = await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(builder: (context) => AddPolicyAddDependentView())
+                                              );
+
+                                              if (result != null) {
+                                                setState(() {
+                                                  widget.policy.dependents.add(result);
+                                                });
+                                              }
+
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 21,
+                                      ),
+                                      Text(
+                                        "Add dependent",
+                                        style: Theme.of(context).textTheme.subtitle1,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+
+
+                    ),
+
+
+
+
+//                    Column(
+//                      children: <Widget>[
+//
+//                        SizedBox(height: 20.0,),
+//                        Text('Net - ${policyTotal.toString()}, Join - ${joiningFee.toString()}, Chronic - ${chronicAddOn.toString()}'),
+//
+//                        FlatButton.icon(
+//                            onPressed: () {
+//                              Navigator.push(
+//                                  context,
+//                                  MaterialPageRoute(builder: (context) =>
+//                                      AddPolicyPreviousMedicalAidView(policy: widget
+//                                          .policy,))
+//                              );
+//                            },
+//                            icon: Icon(Icons.navigate_next),
+//                            label: Text('Next')
+//                        )
+//                      ]
+//                  ),
+                  ],
+                ),
               );
             } else {
               return Loading();
@@ -294,28 +361,219 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
           }
       ) ,
 
-
-      
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-
-          dynamic result = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddPolicyAddDependentView())
-          );
-
-          if (result != null) {
-            setState(() {
-              widget.policy.dependents.add(result);
-            });
-          }
-
-        },
-        child: Icon(Icons.add),
-
-      ),
     );
 
   }
 
 }
+
+
+class DependentViewSummary extends StatefulWidget {
+  Policy policy;
+  double netTotal;
+  double joiningFee;
+  double chronicAddOn;
+  VoidCallback customOnPressed;
+
+  DependentViewSummary({
+    this.policy,
+    this.netTotal,
+    this.joiningFee,
+    this.chronicAddOn,
+    this.customOnPressed
+  });
+
+  @override
+  _DependentViewSummaryState createState() => _DependentViewSummaryState();
+}
+
+class _DependentViewSummaryState extends State<DependentViewSummary> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 220,
+      color: Theme.of(context).primaryColor,
+      padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 21.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          FittedBox(
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  '${widget.policy.firstName} ${widget.policy.surname}',
+                  style: Theme.of(context).textTheme.headline4.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Divider(),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Text('Net premium', style: Theme.of(context).textTheme.subtitle1,),
+                      SizedBox(height: 6.0,),
+                      Text('\$${widget.netTotal}', style: Theme.of(context).textTheme.headline5,),
+                    ],
+                  ),
+                  Column(
+
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Joining fee -', style: TextStyle(color: Colors.white,),),
+                          Text(' \$${widget.joiningFee.toString()}', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),)
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Chronic add-on -', style: TextStyle(color: Colors.white,),),
+                          Text(
+                            ' \$${widget.chronicAddOn.toString()}',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                          )
+                        ],
+                      )
+                    ],
+                  )
+
+                ],
+              ),
+              Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('Dependents', style: Theme.of(context).textTheme.headline6,),
+                  CustomButton(
+                    text: 'Add',
+                    icon: Icons.add,
+                    customOnPressed: widget.customOnPressed,
+
+                  ),
+
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 30,)
+        ],
+      ),
+    );
+  }
+}
+
+
+class DependantCard extends StatefulWidget {
+  final int index;
+  final Dependent dependent;
+
+  DependantCard({
+    this.index,
+    this.dependent
+  });
+
+
+  @override
+  _DependantCardState createState() => _DependantCardState();
+}
+
+class _DependantCardState extends State<DependantCard> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+        onTap: () {
+          showDialog(
+              context:context,
+              builder: (BuildContext context) {
+                return SimpleDialog(
+                  title: Text('${widget.dependent.firstName} ${widget.dependent.surname}'),
+                  children: <Widget>[
+                    Text('Date of birth - ${DateFormat.yMMMMd("en_US").format(widget.dependent.dob)}'),
+                    Text('ID Number - ${widget.dependent.idNumber}'),
+                    Text('Gender - ${widget.dependent.gender}'),
+                    Text('Doctor - ${widget.dependent.doctor['name']}'),
+                    Text('Basic premium - ${widget.dependent.monthlyPremium.toString()}')
+                  ],
+                );
+              }
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 9.0, horizontal: 21.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          padding: EdgeInsets.all(21),
+          child: Container(
+            width: double.infinity,
+            child: Row(
+              children: <Widget>[
+                Flexible(
+                  flex: 1,
+                  child: Image.asset('assets/images/${widget.dependent.package.toLowerCase()}.png'),
+                ),
+                SizedBox(width: 10,),
+                Flexible(
+                  flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          '${widget.dependent.firstName} ${widget.dependent.surname}',
+                          overflow: TextOverflow.fade,
+                          softWrap: false,
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          '${widget.dependent.idNumber} | ${DateFormat.yMMMd("en_US").format(widget.dependent.dob)}',
+                          style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0),
+                        ),
+                      ],
+                    ),
+                ),
+                SizedBox(width: 10,),
+                Flexible(
+                  flex: 2,
+                  child: Column(
+                    children: <Widget>[
+                      Text(
+                        '\$${widget.dependent.monthlyPremium}',
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(fontSize: 18.0, ),
+                      ),
+                      Text(
+                        'J:\$${widget.dependent.joiningFeeAmount} | C:\$${widget.dependent.chronicAddOnAmount}',
+                        style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0),
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+
+                      ),
+                    ],
+                  ),
+
+                ),
+              ],
+            ),
+          ),
+        ),
+
+      );
+  }
+}
+
+

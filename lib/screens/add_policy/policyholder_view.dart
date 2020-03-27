@@ -151,7 +151,9 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                     ),
 
                   ),
-                  SizedBox(height: 20.0,),
+                  SizedBox(height: 10.0,),
+                  Divider(),
+                  SizedBox(height: 10.0,),
                   Text('Gender', textAlign: TextAlign.left,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -162,6 +164,7 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                           backgroundColor: Colors.lightBlue[200],
                           child: Text(_gender[index][0]),
                         ),
+                        selectedColor: Colors.blueAccent,
                         selected: _male == index,
                         onSelected: (selected) {
                           if (selected) {
@@ -174,7 +177,8 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                       );
                     }),
                   ),
-                  SizedBox(height: 20,),
+                  Divider(),
+                  SizedBox(height: 10,),
                   TextFormField(
                     controller: _dobController,
                     decoration: InputDecoration(
@@ -200,7 +204,6 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                   SizedBox(height: 20,),
                   TextFormField(
                     controller: _idController,
-                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: 'ID Number',
                     ),
@@ -209,7 +212,6 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
-                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: 'Phone number',
                     ),
@@ -218,7 +220,6 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    autofocus: true,
                     decoration: InputDecoration(
                       labelText: 'Email',
                     ),

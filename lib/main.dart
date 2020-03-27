@@ -14,6 +14,33 @@ class MyApp extends StatelessWidget {
     return StreamProvider<User>.value(
       value: AuthService().user,
       child: MaterialApp(
+        title: 'Acces Agent',
+        theme: ThemeData(
+          fontFamily: 'Quicksand',
+          buttonColor: Color(0xff68d69d),
+          primaryColor: Color(0xff20253d),
+          accentColor: Color(0xffcdd2de),
+          textTheme: TextTheme(
+            headline5: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            subtitle1: TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w200,
+              color: Color(0xff8c92a5),
+            ),
+            headline6: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w100,
+              color: Colors.white,
+              letterSpacing: 1.3,
+            )
+
+          ),
+        ),
+
         home: Wrapper(),
       ),
     );
