@@ -34,6 +34,7 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
     'Prof.',
     'Honourable',
     'Rev',
+    'Other'
   ];
 
   int _male = 0;
@@ -84,7 +85,7 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
           style: TextStyle(
             color: Colors.grey[700],
             fontSize: 25,
-            fontWeight: FontWeight.w500
+            fontWeight: FontWeight.w700
           ),
         ),
         centerTitle: false,
@@ -94,7 +95,6 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
       body: SingleChildScrollView(
         child: Container(
           decoration: BoxDecoration(
-//            color: Colors.grey[100],
             image: DecorationImage(
               image: AssetImage('assets/images/background.png'),
               fit: BoxFit.cover
@@ -173,9 +173,7 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                       border: Border.all(
                         color: Colors.grey[900],
                       )
-
                     ),
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[

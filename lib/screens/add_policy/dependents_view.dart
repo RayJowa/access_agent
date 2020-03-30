@@ -392,8 +392,14 @@ class _DependentViewSummaryState extends State<DependentViewSummary> {
   Widget build(BuildContext context) {
     return Container(
       height: 220,
-      color: Theme.of(context).primaryColor,
+      //color: Theme.of(context).primaryColor,
       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 21.0),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/background.png'),
+          fit: BoxFit.cover
+        )
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

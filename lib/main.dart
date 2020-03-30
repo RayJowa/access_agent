@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: 'Quicksand',
           buttonColor: Color(0xff68d69d),
-          primaryColor: Color(0xff20253d),
+          primaryColor: Color(0xFF094451),
           accentColor: Color(0xffcdd2de),
           textTheme: TextTheme(
             headline5: TextStyle(
