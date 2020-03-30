@@ -25,7 +25,7 @@ class Policy {
     this.idNumber,
     this.phone,
     this.email,
-    this.dob,
+    this.dob ,
     this.address,
     this.doctor,
     this.dependents,
