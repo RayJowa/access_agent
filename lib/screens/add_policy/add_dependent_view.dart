@@ -47,15 +47,17 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
     super.initState();
     if (widget.dep !=null) {
       dependent = widget.dep;
+      _selectedPackage = packages.indexOf(dependent.package);
+    }else{
+      dependent.gender = 'Male';
+      dependent.package = 'Bronze';
+      dependent.dob = DateTime(DateTime.now().year - 30);
     }
       _nameController.addListener(() =>
       dependent.firstName = _nameController.text);
       _surnameController.addListener(() =>
       dependent.surname = _surnameController.text);
       _idController.addListener(() => dependent.idNumber = _idController.text);
-      dependent.gender = 'Male';
-      dependent.package = 'Bronze';
-      dependent.dob = DateTime(DateTime.now().year - 30);
   }
 
   @override
@@ -184,7 +186,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                         context: context,
                         initialDate: DateTime(DateTime.now().year - 30),
                         firstDate: DateTime(DateTime.now().year - 100),
-                        lastDate: DateTime(DateTime.now().year-18)
+                        lastDate: DateTime(DateTime.now().year)
                     ).then((date) {
                       setState(() {
                         dependent.dob = date;

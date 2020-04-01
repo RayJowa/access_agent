@@ -207,7 +207,7 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
                                                             Text('Are you sure you want to remove'),
                                                             Text(
                                                               '${widget.policy.dependents[index].firstName} ${widget.policy.dependents[index].surname}',
-                                                              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w700),
+                                                              style: TextStyle(color: Color(0xFF094451), fontWeight: FontWeight.w700),
                                                             )
                                                           ],
                                                         ),
@@ -321,6 +321,36 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
                                   ),
                                 ),
                               ),
+                              Divider(),
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) =>
+                                          AddPolicyPreviousMedicalAidView(policy: widget
+                                              .policy,))
+                                  );
+                                },
+
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
+                                  child: Text(
+                                    'Next',
+                                    style: TextStyle(
+                                        fontSize: 25.0,
+                                        color: Colors.grey[200],
+                                        fontWeight: FontWeight.w700
+                                    ),
+                                  ),
+                                ),
+                                color: Color(0xFF094451),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)
+                                ),
+
+                              )
+
+
                             ],
                           ),
                         ),
@@ -335,21 +365,7 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
 //                    Column(
 //                      children: <Widget>[
 //
-//                        SizedBox(height: 20.0,),
-//                        Text('Net - ${policyTotal.toString()}, Join - ${joiningFee.toString()}, Chronic - ${chronicAddOn.toString()}'),
-//
-//                        FlatButton.icon(
-//                            onPressed: () {
-//                              Navigator.push(
-//                                  context,
-//                                  MaterialPageRoute(builder: (context) =>
-//                                      AddPolicyPreviousMedicalAidView(policy: widget
-//                                          .policy,))
-//                              );
-//                            },
-//                            icon: Icon(Icons.navigate_next),
-//                            label: Text('Next')
-//                        )
+
 //                      ]
 //                  ),
                   ],

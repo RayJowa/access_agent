@@ -4,6 +4,7 @@ import 'package:access_agent/models/policy.dart';
 import 'package:access_agent/models/previous_med_aid.dart';
 import 'package:access_agent/screens/add_policy/add_dependent_view.dart';
 import 'package:access_agent/screens/add_policy/dependents_view.dart';
+import 'package:access_agent/screens/add_policy/policyholder_to_dependent_view.dart';
 import 'package:access_agent/shared/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -311,7 +312,7 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                         dynamic result = await Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) =>
-                                AddPolicyAddDependentView(dep: dep,))
+                                PolicyholderToDependantView(dependent: dep, policy: policy,))
                         );
 
                         if (result != null) {
