@@ -5,6 +5,7 @@ import 'package:access_agent/screens/add_policy/add_dependent_view.dart';
 import 'package:access_agent/screens/add_policy/doctor_view.dart';
 import 'package:access_agent/screens/add_policy/previous_medical_aid_view.dart';
 import 'package:access_agent/services/database.dart';
+import 'package:access_agent/shared/constants.dart';
 import 'package:access_agent/shared/custom_button.dart';
 import 'package:access_agent/shared/loading.dart';
 import 'package:access_agent/shared/slide_left.dart';
@@ -140,10 +141,15 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
 
                 policyTotal = widget.policy.dependents.fold(
                     0, (p, c) => p + c.monthlyPremium);
+                widget.policy.basicPremium = policyTotal;
 
                 joiningFee = widget.policy.dependents.fold(0, (p, e) => p + e.joiningFeeAmount);
+                widget.policy.joiningFee = joiningFee;
 
                 chronicAddOn = widget.policy.dependents.fold(0, (p, e) => p + e.chronicAddOnAmount);
+                widget.policy.chronicAddOn = chronicAddOn;
+
+
               }
               return SafeArea(
                 child: Stack(
@@ -520,15 +526,236 @@ class _DependantCardState extends State<DependantCard> {
           showDialog(
               context:context,
               builder: (BuildContext context) {
-                return SimpleDialog(
-                  title: Text('${widget.dependent.firstName} ${widget.dependent.surname}'),
-                  children: <Widget>[
-                    Text('Date of birth - ${DateFormat.yMMMMd("en_US").format(widget.dependent.dob)}'),
-                    Text('ID Number - ${widget.dependent.idNumber}'),
-                    Text('Gender - ${widget.dependent.gender}'),
-                    Text('Doctor - ${widget.dependent.doctor['name']}'),
-                    Text('Basic premium - ${widget.dependent.monthlyPremium.toString()}')
-                  ],
+                return Dialog(
+
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)
+                  ),
+                  child: InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(13.0),
+                      ),
+                      height: 300.0,
+                      width: 300.0,
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            width: double.infinity,
+                            height: 50,
+                            alignment: Alignment.bottomCenter,
+                            decoration: BoxDecoration(
+                              color: Color(0xFF094451),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                topRight: Radius.circular(12)
+                              ),
+                            ),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                '${widget.dependent.firstName} ${widget.dependent.surname}' ?? '',
+                                overflow: TextOverflow.fade,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Date of birth',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  DateFormat.yMMMMd("en_US").format(widget.dependent.dob) ?? '',
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[700]
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            color: Colors.grey[100],
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'ID Number',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  widget.dependent.idNumber ?? '',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700]
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Gender',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  widget.dependent.gender ?? '',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700]
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            color: Colors.grey[100],
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Doctor',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  widget.dependent.doctor['name'] ?? '',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700]
+                                  ),
+                                  overflow: TextOverflow.fade,
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Basic premium',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  widget.dependent.monthlyPremium.toString() ?? '',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700]
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            color: Colors.grey[100],
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Chronic add-on',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  widget.dependent.chronicAddOnAmount.toString() ?? '0.00',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700]
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding:EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                            child: Row(
+                              children: <Widget>[
+                                Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Joining fee',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                                Spacer(),
+                                Text(
+                                  widget.dependent.joiningFeeAmount.toString() ?? '0.00',
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700]
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ) ,
+
                 );
               }
           );

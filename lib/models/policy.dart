@@ -1,4 +1,6 @@
 
+import 'dart:ffi';
+
 import 'package:access_agent/models/dependent.dart';
 import 'package:access_agent/models/previous_med_aid.dart';
 
@@ -16,6 +18,9 @@ class Policy {
   String doctor;
   List<Dependent> dependents;
   PreviousMedAid previousMedAid;
+  double basicPremium;
+  double joiningFee;
+  double chronicAddOn;
 
   Policy ({
     this.title,
@@ -29,7 +34,10 @@ class Policy {
     this.address,
     this.doctor,
     this.dependents,
-    this.previousMedAid
+    this.previousMedAid,
+    this.basicPremium,
+    this.joiningFee,
+    this.chronicAddOn
   });
 
 }

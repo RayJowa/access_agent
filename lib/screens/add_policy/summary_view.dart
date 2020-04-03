@@ -1,6 +1,7 @@
 import 'package:access_agent/models/dependent.dart';
 import 'package:access_agent/models/policy.dart';
 import 'package:access_agent/models/user.dart';
+import 'package:access_agent/screens/add_policy/payment_view.dart';
 import 'package:access_agent/services/database.dart';
 import 'package:access_agent/shared/constants.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                           ),
                         ),
                         Divider(height: 20,),
-                        Text('Policy summary', style: Theme.of(context).textTheme.headline6,),
+                        Text('Premium summary', style: Theme.of(context).textTheme.headline6,),
                       ],
                     ),
 
@@ -109,7 +110,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             Align(
                                               alignment: Alignment.center,
                                               child: Text(
-                                                'Net monthly premium',
+                                                'Basic premium',
                                                 style: TextStyle(
                                                   fontSize: 18.0,
                                                   color: Colors.grey[400],
@@ -118,7 +119,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             ),
                                             Spacer(),
                                             Text(
-                                              '6,614.21',
+                                              widget.policy.basicPremium.toString(),
                                               style: TextStyle(
                                                 fontSize: 20.0,
                                                 color: Colors.grey[400],
@@ -142,7 +143,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             ),
                                             Spacer(),
                                             Text(
-                                              '6,614.21',
+                                              widget.policy.joiningFee.toString(),
                                               style: TextStyle(
                                                 fontSize: 20.0,
                                                 color: Colors.grey[400],
@@ -166,7 +167,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             ),
                                             Spacer(),
                                             Text(
-                                              '6,614.21',
+                                              widget.policy.chronicAddOn.toString(),
                                               style: TextStyle(
                                                 fontSize: 20.0,
                                                 color: Colors.grey[400],
@@ -196,7 +197,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                         ),
                                         Spacer(),
                                         Text(
-                                          '56,614.21',
+                                          '${(widget.policy.basicPremium + widget.policy.joiningFee + widget.policy.chronicAddOn).toString()}',
                                           style: InputTextStyle.inputText1(context),
                                         )
                                       ],
@@ -251,7 +252,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             Align(
                                               alignment: Alignment.center,
                                               child: Text(
-                                                'Net monthly premium',
+                                                'Basic premium',
                                                 style: TextStyle(
                                                   fontSize: 18.0,
                                                   color: Colors.grey[400],
@@ -260,31 +261,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             ),
                                             Spacer(),
                                             Text(
-                                              '6,614.21',
-                                              style: TextStyle(
-                                                fontSize: 20.0,
-                                                color: Colors.grey[400],
-                                              ),
-                                            )
-                                          ],
-
-                                        ),
-                                        SizedBox(height: 10.0,),
-                                        Row(
-                                          children: <Widget>[
-                                            Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                'Joining fee',
-                                                style: TextStyle(
-                                                  fontSize: 18.0,
-                                                  color: Colors.grey[400],
-                                                ),
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            Text(
-                                              '6,614.21',
+                                              widget.policy.basicPremium.toString(),
                                               style: TextStyle(
                                                 fontSize: 20.0,
                                                 color: Colors.grey[400],
@@ -308,7 +285,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                             ),
                                             Spacer(),
                                             Text(
-                                              '6,614.21',
+                                              widget.policy.chronicAddOn.toString(),
                                               style: TextStyle(
                                                 fontSize: 20.0,
                                                 color: Colors.grey[400],
@@ -338,7 +315,7 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                         ),
                                         Spacer(),
                                         Text(
-                                          '56,614.21',
+                                          '${(widget.policy.basicPremium + widget.policy.chronicAddOn).toString()}',
                                           style: InputTextStyle.inputText1(context),
                                         )
                                       ],
@@ -402,7 +379,30 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)
                           ),
-                        )
+                        ),
+                        SizedBox(height: 10.0,),
+                        FlatButton(
+
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) =>AddPolicyPaymentView(widget.policy) ));
+                          },
+
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 37.0),
+                            child: Text(
+                              'Proceed to payment',
+                              style: TextStyle(
+                                  fontSize: 25.0,
+                                  color: Color(0xFF094451),
+                                  fontWeight: FontWeight.w700
+                              ),
+                            ),
+                          ),
+                          color: Colors.grey[200],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)
+                          ),
+                        ),
                       ],
                     ),
 
