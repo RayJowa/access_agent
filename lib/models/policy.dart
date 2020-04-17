@@ -1,11 +1,10 @@
 
-import 'dart:ffi';
-
 import 'package:access_agent/models/dependent.dart';
 import 'package:access_agent/models/previous_med_aid.dart';
 
 class Policy {
 
+  String policyID;
   String title;
   String firstName;
   String surname;
@@ -23,6 +22,7 @@ class Policy {
   double chronicAddOn;
 
   Policy ({
+    this.policyID,
     this.title,
     this.firstName,
     this.surname,

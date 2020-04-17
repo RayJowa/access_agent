@@ -1,5 +1,6 @@
 import 'package:access_agent/models/policy.dart';
 import 'package:access_agent/screens/add_policy/cash_payment_view.dart';
+import 'package:access_agent/screens/add_policy/ecocash_payment_view.dart';
 import 'package:flutter/material.dart';
 
 class AddPolicyPaymentView extends StatefulWidget {
@@ -102,7 +103,7 @@ class _AddPolicyPaymentViewState extends State<AddPolicyPaymentView> {
                                   url: 'assets/images/ecocash.png',
                                 ),
                                 onTap: () {
-//                                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddPolicyCashPaymentView(policy: widget.policy,)));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddPolicyEcocashPaymentView(policy: widget.policy,)));
                                 },
                               ),
                               InkWell(

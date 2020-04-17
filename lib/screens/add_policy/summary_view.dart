@@ -4,6 +4,7 @@ import 'package:access_agent/models/user.dart';
 import 'package:access_agent/screens/add_policy/payment_view.dart';
 import 'package:access_agent/services/database.dart';
 import 'package:access_agent/shared/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -201,7 +202,6 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                                           style: InputTextStyle.inputText1(context),
                                         )
                                       ],
-
                                     ),
                                   )
 
@@ -335,30 +335,30 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
 
                           onPressed: () {
 
-                            Policy _policy = widget.policy;
+//                            Policy _policy = widget.policy;
 
                             //Convert dependent objects into a list for saving to firebase
-                            List _dependentList = [];
-
-                            for (Dependent dependant in _policy.dependents ) {
-                              _dependentList.add(dependant.toMap());
-                            }
-
-                            //save data to firebase
-                            DatabaseService(uid: user.uid).addPolicy(
-                                title: _policy.title,
-                                firstName: _policy.firstName ,
-                                surname: _policy.surname,
-                                gender: _policy.gender,
-                                dob: _policy.dob,
-                                idNumber: _policy.idNumber,
-                                phone: _policy.phone,
-                                email: _policy.email,
-                                dependants: _dependentList,
-                                previousMedAid: widget.policy.previousMedAid.toMap(),
-                                doctor: _policy.doctor
-                            );
-
+//                            List _dependentList = [];
+//
+//                            for (Dependent dependant in _policy.dependents ) {
+//                              _dependentList.add(dependant.toMap());
+//                            }
+//
+//                            //save data to firebase
+//                            DatabaseService(uid: user.uid).addPolicy(
+//                                title: _policy.title,
+//                                firstName: _policy.firstName ,
+//                                surname: _policy.surname,
+//                                gender: _policy.gender,
+//                                dob: _policy.dob,
+//                                idNumber: _policy.idNumber,
+//                                phone: _policy.phone,
+//                                email: _policy.email,
+//                                dependants: _dependentList,
+//                                previousMedAid: widget.policy.previousMedAid.toMap(),
+//                                doctor: _policy.doctor
+//                            );
+                            savePolicy(policy: widget.policy, uid: user.uid);
                             Navigator.of(context).popUntil((route) => route.isFirst);
 
 
@@ -383,7 +383,9 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
                         SizedBox(height: 10.0,),
                         FlatButton(
 
-                          onPressed: () {
+                          onPressed: () async {
+                            widget.policy.policyID = await savePolicy(policy: widget.policy, uid: user.uid);
+                            Navigator.of(context).popUntil((route) => route.isFirst);
                             Navigator.push(context, MaterialPageRoute(builder: (context) =>AddPolicyPaymentView(widget.policy) ));
                           },
 
@@ -415,42 +417,31 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
       ),
     );
   }
+
+  Future<String> savePolicy({Policy policy, String uid}) async {
+    List _dependentList = [];
+
+    for (Dependent dependant in policy.dependents ) {
+      _dependentList.add(dependant.toMap());
+    }
+
+    //save data to firebase
+    DocumentReference docRef = await DatabaseService(uid: uid).addPolicy(
+        title: policy.title,
+        firstName: policy.firstName ,
+        surname: policy.surname,
+        gender: policy.gender,
+        dob: policy.dob,
+        idNumber: policy.idNumber,
+        phone: policy.phone,
+        email: policy.email,
+        dependants: _dependentList,
+        previousMedAid: policy.previousMedAid.toMap(),
+        doctor: policy.doctor
+    );
+
+    return docRef.documentID;
+  }
 }
 
 
-
-
-
-//        FlatButton.icon(
-//            onPressed: () {
-//
-//              Policy _policy = widget.policy;
-//
-//              //Convert dependent objects into a list for saving to firebase
-//              List _dependentList = [];
-//
-//              for (Dependent dependant in _policy.dependents ) {
-//                _dependentList.add(dependant.toMap());
-//              }
-//
-//              //save data to firebase
-//              DatabaseService(uid: user.uid).addPolicy(
-//                  title: _policy.title,
-//                  firstName: _policy.firstName ,
-//                  surname: _policy.surname,
-//                  gender: _policy.gender,
-//                  dob: _policy.dob,
-//                  idNumber: _policy.idNumber,
-//                  phone: _policy.phone,
-//                  email: _policy.email,
-//                  dependants: _dependentList,
-//                  previousMedAid: widget.policy.previousMedAid.toMap(),
-//                  doctor: _policy.doctor
-//              );
-//
-//              Navigator.of(context).popUntil((route) => route.isFirst);
-//
-//            },
-//            icon: Icon(Icons.done_outline),
-//            label: Text('Save policy')
-//        ),

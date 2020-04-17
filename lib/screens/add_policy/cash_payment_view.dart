@@ -1,5 +1,6 @@
 import 'package:access_agent/models/policy.dart';
 import 'package:access_agent/shared/constants.dart';
+import 'package:access_agent/shared/dialogues.dart';
 import 'package:flutter/material.dart';
 
 class AddPolicyCashPaymentView extends StatefulWidget {
@@ -99,12 +100,16 @@ class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
                         ),
                         SizedBox(height: 20.0),
                         FlatButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            Dialogs().paymentProcessing(context: context);
+                            await Future.delayed(Duration(seconds: 5));
+                            Navigator.pop(context);
+                          },
 
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
                             child: Text(
-                              'Done',
+                              'Pay',
                               style: TextStyle(
                                   fontSize: 25.0,
                                   color: Colors.grey[200],
