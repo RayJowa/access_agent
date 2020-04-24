@@ -31,11 +31,9 @@ class DatabaseService {
     });
   }
 
-  Future<DocumentSnapshot> getAgentData()   {
-    return agentCollection.document(uid).get();
+  Future<DocumentSnapshot> getAgentData() {
+    return  agentCollection.document(uid).get();
   }
-
-
 
 
   //get agents
@@ -127,6 +125,40 @@ class DatabaseService {
     });
   }
 
+
+  getPolicies({int perPage, DocumentSnapshot startAfter, String surname, String idNumber}) async {
+
+    Query q;
+    String endSurname = surname + 'z';
+    String endID = idNumber + 'z';
+
+    if (startAfter == null) {
+      q = policyCollection
+          .where('surname', isGreaterThanOrEqualTo: surname)
+          .where('surname', isLessThanOrEqualTo: endSurname)
+          .where('idNumber', isGreaterThanOrEqualTo: idNumber)
+          .where('idNumber', isLessThanOrEqualTo: endID)
+          .orderBy('surname')
+          .limit(perPage);
+    }else{
+      q = policyCollection
+          .where('surname', isGreaterThanOrEqualTo: surname)
+          .where('surname', isLessThanOrEqualTo: endSurname)
+          .where('idNumber', isGreaterThanOrEqualTo: idNumber)
+          .where('idNumber', isLessThanOrEqualTo: endID)
+          .orderBy('surname')
+          .startAfterDocument(startAfter)
+          .limit(perPage);
+    }
+
+    QuerySnapshot query = await q.getDocuments();
+    return query;
+
+  }
+
+  Future getPolicy(policyID)async {
+    return await Firestore.instance.document('/policy/$policyID').get();
+  }
 
   Future addReceipt ({
     String receiptID,

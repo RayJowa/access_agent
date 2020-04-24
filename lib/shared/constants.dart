@@ -50,5 +50,13 @@ class InputTextStyle {
   static TextStyle inputText2(BuildContext context) {
     return Theme.of(context).textTheme.headline5.copyWith(color: Colors.grey[600]);
   }
+
+  static TextStyle smallLabels(BuildContext context) {
+    return Theme.of(context).textTheme.bodyText2;
+  }
+
+  static TextStyle labels2(BuildContext context) {
+    return Theme.of(context).textTheme.headline5.copyWith(fontSize: 18);
+  }
 }
 

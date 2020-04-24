@@ -505,12 +505,17 @@ class _DependentViewSummaryState extends State<DependentViewSummary> {
 
 
 class DependantCard extends StatefulWidget {
+
+  final bool card;
   final int index;
   final Dependent dependent;
+  VoidCallback customOnPressed = () {};
 
   DependantCard({
     this.index,
-    this.dependent
+    this.dependent,
+    this.card = false,
+    this. customOnPressed
   });
 
 
@@ -537,7 +542,7 @@ class _DependantCardState extends State<DependantCard> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(13.0),
                       ),
-                      height: 300.0,
+                      height: 310.0,
                       width: 300.0,
                       child: Column(
                         children: <Widget>[
@@ -751,6 +756,33 @@ class _DependantCardState extends State<DependantCard> {
                               ],
                             ),
                           ),
+                          widget.card ?
+                            FlatButton(
+                              onPressed: widget.customOnPressed,
+                              color: Color(0xFF094451),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)) ,
+                              child: Text(
+                                'View card',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16
+                                  ),
+                                ),
+                            ) :
+                          FlatButton(
+                            onPressed: () {},
+                            color: Color(0xFF094451),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)) ,
+                            child: Text(
+                              'Close',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16
+                              ),
+                            ),
+                          )
+
+
                         ],
                       ),
                     ),
@@ -795,6 +827,7 @@ class _DependantCardState extends State<DependantCard> {
                     ),
                 ),
                 SizedBox(width: 10,),
+                Spacer(),
                 Flexible(
                   flex: 2,
                   child: Column(

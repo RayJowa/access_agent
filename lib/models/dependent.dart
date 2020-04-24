@@ -45,3 +45,20 @@ class Dependent {
     };
   }
 }
+
+Dependent dependentFromFirebaseData(dependant) {
+  return Dependent(
+    firstName: dependant['firstName'],
+    surname: dependant['surname'],
+    gender: dependant['gender'],
+    idNumber: dependant['idNumber'],
+    dob: dependant['dob'].toDate(),
+    doctor: dependant['doctor'],
+    package: dependant['package'],
+    joiningFee: dependant['joiningFee'],
+    joiningFeeAmount: dependant['joiningFeeAmount'],
+    chronicAddOn: dependant['chronicAddOn'],
+    chronicAddOnAmount: dependant['chronicAddOnAmount'],
+    monthlyPremium: dependant['monthlyPremium']
+  );
+}
