@@ -23,6 +23,12 @@ class _PolicyholderToDependantViewState extends State<PolicyholderToDependantVie
   String docId;
 
   @override
+  void initState() {
+    super.initState();
+    widget.dependent.package = 'Bronze';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,

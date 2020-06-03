@@ -427,17 +427,21 @@ class _AddPolicySummaryViewState extends State<AddPolicySummaryView> {
 
     //save data to firebase
     DocumentReference docRef = await DatabaseService(uid: uid).addPolicy(
-        title: policy.title,
-        firstName: policy.firstName ,
-        surname: policy.surname,
-        gender: policy.gender,
-        dob: policy.dob,
-        idNumber: policy.idNumber,
-        phone: policy.phone,
-        email: policy.email,
-        dependants: _dependentList,
-        previousMedAid: policy.previousMedAid.toMap(),
-        doctor: policy.doctor
+      title: policy.title,
+      firstName: policy.firstName ,
+      surname: policy.surname,
+      gender: policy.gender,
+      dob: policy.dob,
+      idNumber: policy.idNumber,
+      phone: policy.phone,
+      email: policy.email,
+      dependants: _dependentList,
+      previousMedAid: policy.previousMedAid.toMap(),
+      doctor: policy.doctor,
+      basicPremium: policy.basicPremium,
+      joiningFee: policy.joiningFee,
+      chronicAddOn: policy.chronicAddOn
+
     );
 
     return docRef.documentID;

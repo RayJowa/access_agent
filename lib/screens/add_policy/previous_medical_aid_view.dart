@@ -188,14 +188,17 @@ class _AddPolicyPreviousMedicalAidViewState extends State<AddPolicyPreviousMedic
                             );
                           },
 
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
-                            child: Text(
-                              'Next',
-                              style: TextStyle(
-                                  fontSize: 25.0,
-                                  color: Colors.grey[200],
-                                  fontWeight: FontWeight.w700
+                          child: SizedBox(
+                            width: 200,
+                            height: 40,
+                            child: Center(
+                              child: Text(
+                                'Next',
+                                style: TextStyle(
+                                    fontSize: 25.0,
+                                    color: Colors.grey[200],
+                                    fontWeight: FontWeight.w700
+                                ),
                               ),
                             ),
                           ),

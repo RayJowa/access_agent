@@ -135,34 +135,38 @@ class _DisplayCardViewState extends State<DisplayCardView> {
                                           size: 110 ,
                                         ),
                                         VerticalDivider(),
-                                        Column(
-                                          children: <Widget> [
-                                            Text(
-                                              'Doctor ',
+                                        Expanded(
+                                          child: Column(
 
-                                            ),
-                                            Text(
-                                              widget.dependent.doctor['name'],
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w700
+
+                                            children: <Widget> [
+                                              Text(
+                                                'Doctor ',
+
                                               ),
-                                            ),
-                                            Divider(),
-                                            Text(
-                                              'Package',
-
-                                            ),
-                                            Text(
-                                              widget.dependent.package ?? 'TBA',
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w700
+                                              Text(
+                                                widget.dependent.doctor['name'],
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w700
+                                                ),
                                               ),
-                                            )
+                                              SizedBox(height: 16,),
+                                              Text(
+                                                'Package',
+
+                                              ),
+                                              Text(
+                                                widget.dependent.package ?? 'TBA',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w700
+                                                ),
+                                              )
 
 
-                                          ]
+                                            ]
+                                          ),
                                         )
                                       ],
 

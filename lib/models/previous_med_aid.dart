@@ -24,3 +24,29 @@ class PreviousMedAid {
   }
 }
 
+PreviousMedAid previousMedAidFromFirebaseData(previousMedAid) {
+
+  DateTime dateJoined;
+  DateTime dateTerminated;
+
+  try {
+    dateJoined =  previousMedAid['joined'].toDate();
+  } catch(e) {
+    dateJoined = null;
+  }
+
+  try {
+    dateTerminated =  previousMedAid['terminated'].toDate();
+  } catch(e) {
+    dateTerminated = null;
+  }
+
+  return PreviousMedAid(
+    name: previousMedAid['name'],
+    package: previousMedAid['package'],
+    number: previousMedAid['number'],
+    joined: dateJoined,
+    terminated: dateTerminated
+  );
+}
+

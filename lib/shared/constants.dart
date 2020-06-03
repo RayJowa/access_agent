@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/number_symbols.dart';
 
 var textInputDecoration = InputDecoration(
   fillColor: Colors.transparent,
@@ -60,3 +62,6 @@ class InputTextStyle {
   }
 }
 
+class NumberFormats {
+  NumberFormat currencyFormat = NumberFormat.currency(symbol: '\$');
+}

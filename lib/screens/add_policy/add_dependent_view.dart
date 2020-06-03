@@ -2,6 +2,8 @@ import 'package:access_agent/models/dependent.dart';
 import 'package:access_agent/screens/add_policy/doctor_view.dart';
 import 'package:access_agent/shared/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:intl/intl.dart';
 
 class AddPolicyAddDependentView extends StatefulWidget {
@@ -16,6 +18,7 @@ class AddPolicyAddDependentView extends StatefulWidget {
 class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
 
   // final Policy policy = Policy();
+  final _formKey = GlobalKey<FormState>();
   Dependent dependent = Dependent();
 
 
@@ -48,6 +51,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
     if (widget.dep !=null) {
       dependent = widget.dep;
       _selectedPackage = packages.indexOf(dependent.package);
+      _doctorController.text = dependent.doctor['name'];
     }else{
       dependent.gender = 'Male';
       dependent.package = 'Bronze';
@@ -67,6 +71,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
     _surnameController.text = dependent.surname;
     _dobController.text = DateFormat.yMMMMd("en_US").format(dependent.dob);
     _idController.text = dependent.idNumber;
+
 
 
     return Scaffold(
@@ -93,26 +98,44 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
               )
           ),
           child: Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
                 TextFormField(
                   controller: _nameController,
+                  textCapitalization: TextCapitalization.characters,
+                  textInputAction: TextInputAction.next,
+                  validator: (name) {
+                    if (name.length < 2) {
+                      return 'Name should have at least two characters';
+                    }else{
+                      return null;
+                    }
+                  },
                   decoration: textInputDecoration.copyWith(
                       labelText: 'Name',
                       hintText: 'Name'
                   ),
                   style: InputTextStyle.inputText1(context),
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(height: 16.0,),
                 TextFormField(
                   controller: _surnameController,
+                  textCapitalization: TextCapitalization.characters,
+                  validator: (name) {
+                    if (name.length < 2) {
+                      return 'Name should have at least two characters';
+                    }else{
+                      return null;
+                    }
+                  },
                   decoration: textInputDecoration.copyWith(
                       labelText: 'Surname',
                       hintText: 'Surname'
                   ),
                   style: InputTextStyle.inputText1(context),
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(height: 16.0,),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
                   decoration: BoxDecoration(
@@ -172,7 +195,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                   ),
                 ),
 
-                SizedBox(height: 20,),
+                SizedBox(height: 16,),
                 TextFormField(
                   controller: _dobController,
                   decoration: textInputDecoration.copyWith(
@@ -182,31 +205,81 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                   style: InputTextStyle.inputText1(context),
                   readOnly: true,
                   onTap: () {
-                    showDatePicker(
-                        context: context,
-                        initialDate: DateTime(DateTime.now().year - 30),
-                        firstDate: DateTime(DateTime.now().year - 100),
-                        lastDate: DateTime(DateTime.now().year)
-                    ).then((date) {
-                      setState(() {
-                        dependent.dob = date;
-                        _dobController.text =DateFormat.yMMMMd("en_US").format(dependent.dob);
-                      });
-                    }
+
+                    DatePicker.showDatePicker(
+                        context,
+
+                        minDateTime: DateTime(DateTime.now().year - 100),
+                        maxDateTime: DateTime.now(),
+                        initialDateTime: DateTime(DateTime.now().year - 30),
+                        dateFormat: 'yyyy-MMM-d',
+                        pickerTheme: DateTimePickerTheme(
+                            showTitle: true,
+                            confirm: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Color(0xFF094451),
+                                ),
+
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                child: Text(
+                                  'Confirm',
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                )
+                            ),
+                            cancel: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.redAccent,
+                                ),
+
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                )
+                            ),
+
+                            itemTextStyle: InputTextStyle.inputText2(context)
+                        ),
+                        onConfirm: (dateTime, List<int> index) {
+                          dependent.dob = dateTime;
+                          _dobController.text =DateFormat.yMMMMd("en_US").format(dependent.dob);
+                        }
                     );
                   },
                 ),
-                SizedBox(height: 20.0,),
-
+                SizedBox(height: 16.0,),
                 TextFormField(
                   controller: _idController,
+                  textCapitalization: TextCapitalization.characters,
+                  textInputAction: TextInputAction.next,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(14),
+                    WhitelistingTextInputFormatter(RegExp('([0-9A-Z-])')),
+                  ],
+                  validator: (name) {
+                    if (name.length < 10) {
+                      return 'Invalid ID number';
+                    }else{
+                      return null;
+                    }
+                  },
                   decoration: textInputDecoration.copyWith(
-                      labelText: 'ID Number',
-                      hintText: 'ID Number'
+                      labelText: 'ID number',
+                      hintText: 'ID number'
                   ),
                   style: InputTextStyle.inputText1(context),
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(height: 16.0,),
                 Container(
                   padding: EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
                   decoration: BoxDecoration(
@@ -263,8 +336,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                     ],
                   ),
                 ),
-
-                SizedBox(height: 20.0,),
+                SizedBox(height: 16.0,),
 
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
@@ -347,13 +419,21 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                   ),
                 ),
 
-                SizedBox(height: 20,),
+                SizedBox(height: 16.0,),
                 TextFormField(
                   controller: _doctorController,
                   decoration: textInputDecoration.copyWith(
                       labelText: 'Choose a doctor',
                       hintText: 'Choose a doctor'
                   ),
+                  //TODO: Set readOnly: true to disable typing of doctor
+                  validator: (doctor) {
+                    if (doctor == '') {
+                      return 'Please select a doctor';
+                    }else{
+                      return null;
+                    }
+                  },
                   style: InputTextStyle.inputText1(context),
                   onTap:() async {
                     dynamic result = await Navigator.push(context, MaterialPageRoute(builder: (context) => AddPolicyDoctorView()));
@@ -365,26 +445,29 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
 
                   },
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(height: 16.0,),
 
                 FlatButton.icon(
+
                   onPressed: () {
+                    if (_formKey.currentState.validate()) {
 
-                    Map doctor = {
-                      'name': _doctorController.text,
-                      'docid': docId
-                    };
+                      Map doctor = {
+                        'name': _doctorController.text,
+                        'docid': docId
+                      };
 
-                    dependent.firstName = _nameController.text;
-                    dependent.surname = _surnameController.text;
-                    dependent.idNumber = _idController.text;
-                    dependent.doctor = doctor;
+                      dependent.firstName = _nameController.text;
+                      dependent.surname = _surnameController.text;
+                      dependent.idNumber = _idController.text;
+                      dependent.doctor = doctor;
 
 
-                    Navigator.pop(
-                      context,
-                      dependent
-                    );
+                      Navigator.pop(
+                          context,
+                          dependent
+                      );
+                    }
                   },
                   icon: Icon(Icons.navigate_next),
                   label: Padding(

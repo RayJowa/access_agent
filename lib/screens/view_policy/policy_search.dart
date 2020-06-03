@@ -13,7 +13,7 @@ class ViewPolicySearchView extends StatefulWidget {
 
 class _ViewPolicySearchViewState extends State<ViewPolicySearchView> {
 
-  TextEditingController _policyNumberController = TextEditingController();
+//  TextEditingController _policyNumberController = TextEditingController();
   TextEditingController _surnameController = TextEditingController();
   TextEditingController _IDController = TextEditingController();
 
@@ -118,9 +118,13 @@ class _ViewPolicySearchViewState extends State<ViewPolicySearchView> {
                         SizedBox(height: 20.0),
                         FlatButton(
                           onPressed: () {
+
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (BuildContext context) => ViewPolicyListView())
+                                MaterialPageRoute(builder: (BuildContext context) => ViewPolicyListView(
+                                  surname: _surnameController.text ?? '',
+                                  idNumber: _IDController.text ?? '',
+                                ))
                             );
                           },
 

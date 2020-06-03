@@ -1,10 +1,13 @@
 import 'package:access_agent/models/dependent.dart';
+import 'package:access_agent/models/policy.dart';
 import 'package:access_agent/screens/add_policy/dependents_view.dart';
+import 'package:access_agent/screens/add_policy/payment_view.dart';
 import 'package:access_agent/screens/view_policy/view_card.dart';
 import 'package:access_agent/shared/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class PolicyDetailView extends StatefulWidget {
 
@@ -85,24 +88,29 @@ class _PolicyDetailViewState extends State<PolicyDetailView> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.attach_money,
-                    size: 25,
-                    color: Colors.grey,
-                  ),
-                  Text(
-                    'Make payment',
-                    style: TextStyle(
+              FlatButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) =>AddPolicyPaymentView(policyFromFirebaseData(widget.policy)) ));
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(
+                      Icons.attach_money,
+                      size: 25,
                       color: Colors.grey,
-                      fontSize: 16
                     ),
+                    Text(
+                      'Make payment',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16
+                      ),
 
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -129,8 +137,6 @@ class _PolicyDetailViewState extends State<PolicyDetailView> {
     );
   }
 }
-
-
 
 class PolicySummary extends StatelessWidget {
 
@@ -199,7 +205,7 @@ class PolicySummary extends StatelessWidget {
                             style: InputTextStyle.smallLabels(context).copyWith(color: Colors.grey[400]),
                           ),
                           Text(
-                            '15 Oct 2023',
+                            customDateFromTimestamp(policy.data['inceptionDate']),
                             style: InputTextStyle.labels2(context),
                           )
                         ],
@@ -212,7 +218,22 @@ class PolicySummary extends StatelessWidget {
                             style: InputTextStyle.smallLabels(context).copyWith(color: Colors.grey[400]),
                           ),
                           Text(
-                            '12 Aug 2020',
+                            customDateFromTimestamp(policy.data['nextDueDate']),
+                            style: InputTextStyle.labels2(context),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            'Account balance ',
+                            style: InputTextStyle.smallLabels(context).copyWith(color: Colors.grey[400]),
+                          ),
+                          Text(
+                            NumberFormats().currencyFormat.format(
+                              policy.data['accountBalance']
+                            ) ?? '0',
                             style: InputTextStyle.labels2(context),
                           ),
                         ],
@@ -237,5 +258,14 @@ class PolicySummary extends StatelessWidget {
       ),
     );
   }
+}
+
+String customDateFromTimestamp(date) {
+  try{
+    return DateFormat.yMMMd("en_US").format(date.toDate());
+  }catch(e){
+    return '-';
+  }
+
 }
 

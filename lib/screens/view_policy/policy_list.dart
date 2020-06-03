@@ -6,6 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ViewPolicyListView extends StatefulWidget {
+
+  final String surname;
+  final String idNumber;
+  ViewPolicyListView({this.surname, this.idNumber});
+
   @override
   _ViewPolicyListViewState createState() => _ViewPolicyListViewState();
 }
@@ -28,13 +33,17 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
       _loadingPolicies = true;
     });
 
-    QuerySnapshot query = await DatabaseService().getPolicies(perPage: perPage);
+    QuerySnapshot query = await DatabaseService().getPolicies(
+      perPage: perPage,
+      surname: widget.surname,
+      idNumber: widget.idNumber
+    );
 
     policies = query.documents;
 
-    print('policies==========================================');
-    print(policies.toString());
-    lastDocument = query.documents[query.documents.length-1];
+    if (query.documents.length > 0) {
+      lastDocument = query.documents[query.documents.length - 1];
+    }
 
     setState(() {
       _loadingPolicies = false;
@@ -57,13 +66,21 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
     }
 
     _gettingMorePolicies = true;
-    QuerySnapshot query = await DatabaseService().getPolicies(perPage: perPage, startAfter: lastDocument);
+    QuerySnapshot query = await DatabaseService().getPolicies(
+      perPage: perPage,
+      startAfter: lastDocument,
+      surname: widget.surname,
+      idNumber: widget.idNumber
+    );
 
     if (query.documents.length < perPage) {
       _morePoliciesAvailable = false;
     }
     policies.addAll(query.documents);
-    lastDocument = query.documents[query.documents.length-1];
+
+    if (query.documents.length > 0) {
+      lastDocument = query.documents[query.documents.length - 1];
+    }
 
     setState(() {});
 
@@ -189,16 +206,20 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
                     SizedBox(height: 12.0),
                     FlatButton(
                       onPressed: () {
+                        Navigator.pop(context);
                       },
 
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
-                        child: Text(
-                          'Back',
-                          style: TextStyle(
-                              fontSize: 25.0,
-                              color: Colors.grey[200],
-                              fontWeight: FontWeight.w700
+                      child: SizedBox(
+                        height: 50,
+                        width: 200,
+                        child: Center(
+                          child: Text(
+                            'Back',
+                            style: TextStyle(
+                                fontSize: 25.0,
+                                color: Colors.grey[200],
+                                fontWeight: FontWeight.w700
+                            ),
                           ),
                         ),
                       ),

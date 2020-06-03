@@ -1,5 +1,11 @@
+
+import 'dart:ffi';
+
 import 'package:access_agent/models/policy.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 class DatabaseService {
 
@@ -17,12 +23,12 @@ class DatabaseService {
 
 
   //update or create agent data
-  Future updateAgentData(
-      String firstName,
-      String surname,
-      String city,
-      String phone
-      ) async {
+  Future updateAgentData({
+    String firstName,
+    String surname,
+    String city,
+    String phone
+  }) async {
     return await agentCollection.document(uid).setData({
       'firstName': firstName,
       'surname': surname,
@@ -78,7 +84,13 @@ class DatabaseService {
 
   //get packages and prices
   Future getPackages() async {
-    return await Firestore.instance.document('/pricing/pricing').get();
+    try {
+      return await Firestore.instance.document('/pricing/pricing').get();
+    } catch(e) {
+      print('Error================================');
+      print(e.toString());
+      return null;
+    }
   }
 
 
@@ -96,6 +108,9 @@ class DatabaseService {
     List dependants,
     String doctor,
     Map previousMedAid,
+    double basicPremium,
+    double joiningFee,
+    double chronicAddOn
   }) async {
     //TODO: consider getting user once and passing details between views
     DocumentSnapshot agent = await agentCollection.document(uid).get();
@@ -103,8 +118,6 @@ class DatabaseService {
     agentCollection.document(uid).updateData({
       'totalPolicies': FieldValue.increment(1)
     });
-
-
 
     return await policyCollection.add({
       'title' : title,
@@ -119,40 +132,72 @@ class DatabaseService {
       'dependents': dependants,
       'doctor': doctor,
       'previous med aid': previousMedAid,
+      'basicPremium': basicPremium,
+      'joiningFee': joiningFee,
+      'chronicAddOn': chronicAddOn,
       'dateCreated': DateTime.now(),
       'agentID': uid,
-      'Agent Name': '${agent.data['firstName']} ${agent.data['surname']}'
+      'Agent Name': '${agent.data['firstName']} ${agent.data['surname']}',
+      'accountBalance' : 0,
+      'status': 'quote'
+
     });
   }
 
 
-  getPolicies({int perPage, DocumentSnapshot startAfter, String surname, String idNumber}) async {
+  getPolicies({int perPage, DocumentSnapshot startAfter, String surname, String idNumber, String status = 'active'}) async {
 
     Query q;
     String endSurname = surname + 'z';
-    String endID = idNumber + 'z';
 
-    if (startAfter == null) {
-      q = policyCollection
-          .where('surname', isGreaterThanOrEqualTo: surname)
-          .where('surname', isLessThanOrEqualTo: endSurname)
-          .where('idNumber', isGreaterThanOrEqualTo: idNumber)
-          .where('idNumber', isLessThanOrEqualTo: endID)
-          .orderBy('surname')
-          .limit(perPage);
+
+    print('===========================================');
+    print(surname);
+    print(idNumber);
+    print('===========================================');
+
+    if (idNumber == '' || idNumber == null) {
+      if (startAfter == null) {
+        q = policyCollection
+            .where('surname', isGreaterThanOrEqualTo: surname)
+            .where('surname', isLessThanOrEqualTo: endSurname)
+            .where('status', isEqualTo: status)
+            .orderBy('surname')
+            .limit(perPage);
+      } else {
+        q = policyCollection
+            .where('surname', isGreaterThanOrEqualTo: surname)
+            .where('surname', isLessThanOrEqualTo: endSurname)
+            .where('status', isEqualTo: status)
+            .orderBy('surname')
+            .startAfterDocument(startAfter)
+            .limit(perPage);
+      }
     }else{
-      q = policyCollection
-          .where('surname', isGreaterThanOrEqualTo: surname)
-          .where('surname', isLessThanOrEqualTo: endSurname)
-          .where('idNumber', isGreaterThanOrEqualTo: idNumber)
-          .where('idNumber', isLessThanOrEqualTo: endID)
-          .orderBy('surname')
-          .startAfterDocument(startAfter)
-          .limit(perPage);
+      if (startAfter == null) {
+        q = policyCollection
+            .where('surname', isGreaterThanOrEqualTo: surname)
+            .where('surname', isLessThanOrEqualTo: endSurname)
+            .where('idNumber', isEqualTo: idNumber)
+            .where('status', isEqualTo: status)
+            .orderBy('surname')
+            .limit(perPage);
+      } else {
+        q = policyCollection
+            .where('surname', isGreaterThanOrEqualTo: surname)
+            .where('surname', isLessThanOrEqualTo: endSurname)
+            .where('idNumber', isEqualTo: idNumber)
+            .where('status', isEqualTo: status)
+            .orderBy('surname')
+            .startAfterDocument(startAfter)
+            .limit(perPage);
+      }
     }
 
     QuerySnapshot query = await q.getDocuments();
+
     return query;
+
 
   }
 
@@ -189,14 +234,22 @@ class DatabaseService {
     //Check if policy has any existing debit and create one if not.
     var debit = await debitsCollection.where('policyID', isEqualTo: policy.policyID).limit(1).getDocuments();
 
+    double amount = policy.basicPremium + policy.joiningFee + policy.chronicAddOn;
+
     if (debit.documents.length == 0) {
       debitsCollection.add({
         'debitDate': DateTime.now(),
-        'amount': policy.basicPremium + policy.joiningFee + policy.chronicAddOn,
+        'amount': amount,
         'policyID': policy.policyID,
-        'balance': policy.basicPremium + policy.joiningFee + policy.chronicAddOn,
+        'balance': amount,
         'notes': 'Policy inception',
         'match': null
+      });
+
+      policyCollection.document(policy.policyID).updateData({
+        'inceptionDate': DateTime.now(),
+        'accountBalance': FieldValue.increment(0.0 - amount),
+        'status': 'active'
       });
 
       agentCollection.document(uid).updateData({
@@ -213,93 +266,115 @@ class DatabaseService {
           .where('balance', isGreaterThan: 0)
           .getDocuments();
 
-      debitsList.documents.sort((a,b) {
-        var adate = a.data['debitDate'];
-        var bdate = b.data['debitDate'];
-        return bdate.compareTo(adate);
-      });
-      
-      DocumentSnapshot rates = await Firestore.instance.document('/apportionment/rates').get();
+      print('===========================================');
+      print(debitsList.documents.length.toString());
+      print('===========================================');
+
+      if (debitsList.documents.length > 0) {
+        debitsList.documents.sort((a, b) {
+          var adate = a.data['debitDate'];
+          var bdate = b.data['debitDate'];
+          return bdate.compareTo(adate);
+        });
+
+        DocumentSnapshot rates = await Firestore.instance.document(
+            '/apportionment/rates').get();
 
 
-      for (DocumentSnapshot debit in debitsList.documents) {
+        for (DocumentSnapshot debit in debitsList.documents) {
+          DocumentSnapshot receipt = await receiptsCollection.document(
+              receiptID)
+              .get();
 
-        DocumentSnapshot receipt = await receiptsCollection.document(receiptID)
-            .get();
+          if (debit.data['balance'] <= receipt.data['unmatchedAmount']) {
+            // debit amount is smaller than available credit, therefore, debit should be fully paid
+            double matchAmount = debit.data['balance'].toDouble();
+            double agentCommission = (rates.data['agent'] *
+                debit.data['amount']).toDouble();
 
-        if (debit.data['balance'] <= receipt.data['unmatchedAmount']) {
-          
-          // debit amount is smaller than available credit, therefore, debit should be fully paid
-          double matchAmount = debit.data['balance'].toDouble();
-          double agentCommission = (rates.data['agent'] * debit.data['amount']).toDouble();
+            //record match entry in debit
+            Map debitMatch = {
+              'receiptID': receipt.documentID,
+              'amount': matchAmount,
+              'matchDate': DateTime.now()
+            };
 
-          //record match entry in debit
-          Map debitMatch = {
-            'receiptID': receipt.documentID,
-            'amount': matchAmount,
-            'matchDate': DateTime.now()
-          };
-    
-          //record match entry in receipt 
-          Map receiptMatch = {
-            'debitID': debit.documentID,
-            'amount': matchAmount,
-            'matchDate': DateTime.now()
-          };
+            //record match entry in receipt
+            Map receiptMatch = {
+              'debitID': debit.documentID,
+              'amount': matchAmount,
+              'matchDate': DateTime.now()
+            };
 
-          //calculate new unmatched balance after matching
-          double newReceiptUnmatched = receipt.data['unmatchedAmount'].toDouble() - matchAmount;
+            //calculate new unmatched balance after matching
+            double newReceiptUnmatched = receipt.data['unmatchedAmount']
+                .toDouble() - matchAmount;
 
-          //update transaction to receipt database
-          receiptsCollection.document(receipt.documentID).updateData({
-            'match': FieldValue.arrayUnion([receiptMatch]),
-            'unmatchedAmount': newReceiptUnmatched
-          });
+            //update transaction to receipt database
+            receiptsCollection.document(receipt.documentID).updateData({
+              'match': FieldValue.arrayUnion([receiptMatch]),
+              'unmatchedAmount': newReceiptUnmatched
+            });
 
-          //update transaction to debit in database 
-          debitsCollection.document(debit.documentID).updateData({
-            'match': FieldValue.arrayUnion([debitMatch]),
-            'balance': 0
-          });
-          
-          //debit is now fully paid, therefor update agent commission due
-          agentCollection.document(uid).updateData({
-            'commissionDue': FieldValue.increment(agentCommission),
-            'monthCommission': FieldValue.increment(agentCommission),
-          });
+            //update transaction to debit in database
+            debitsCollection.document(debit.documentID).updateData({
+              'match': FieldValue.arrayUnion([debitMatch]),
+              'balance': 0
+            });
 
-          //get current commission
-          
+            //update next due date on policy
+            DateTime nextDueDate = Jiffy(
+              DateFormat.yMMMMd('en_US').format(
+                debit.data['debitDate'].toDate()
+              ),
+              'yMMMMd'
+            ).add(months: 1);
 
-        }else{
-          double matchAmount = receipt.data['unmatchedAmount'];
+            policyCollection.document(policyID).updateData({
+              'nextDueDate' : nextDueDate,
+              'accountBalance' : FieldValue.increment(matchAmount)
 
-          double newBalance = debit.data['balance'] - matchAmount;
-
-          Map debitMatch = {
-            'receiptID': receipt.documentID,
-            'amount': matchAmount,
-            'matchDate': DateTime.now()
-          };
-
-          Map receiptMatch = {
-            'debitID': debit.documentID,
-            'amount': matchAmount,
-            'matchDate': DateTime.now()
-          };
-
-          receiptsCollection.document(receipt.documentID).updateData({
-            'match': FieldValue.arrayUnion([receiptMatch]),
-            'unmatchedAmount': 0
-          });
-
-          debitsCollection.document(debit.documentID).updateData({
-            'match': FieldValue.arrayUnion([debitMatch]),
-            'balance': newBalance
-          });
+            });
 
 
-          break;
+            //debit is now fully paid, therefor update agent commission due
+            agentCollection.document(uid).updateData({
+              'commissionDue': FieldValue.increment(agentCommission),
+              'monthCommission': FieldValue.increment(agentCommission),
+            });
+
+            //get current commission
+
+
+          } else {
+            double matchAmount = receipt.data['unmatchedAmount'];
+
+            double newBalance = debit.data['balance'] - matchAmount;
+
+            Map debitMatch = {
+              'receiptID': receipt.documentID,
+              'amount': matchAmount,
+              'matchDate': DateTime.now()
+            };
+
+            Map receiptMatch = {
+              'debitID': debit.documentID,
+              'amount': matchAmount,
+              'matchDate': DateTime.now()
+            };
+
+            receiptsCollection.document(receipt.documentID).updateData({
+              'match': FieldValue.arrayUnion([receiptMatch]),
+              'unmatchedAmount': 0
+            });
+
+            debitsCollection.document(debit.documentID).updateData({
+              'match': FieldValue.arrayUnion([debitMatch]),
+              'balance': newBalance
+            });
+
+            break;
+          }
         }
       }
 //    }catch(e) {

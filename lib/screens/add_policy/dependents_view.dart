@@ -149,7 +149,7 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
                 chronicAddOn = widget.policy.dependents.fold(0, (p, e) => p + e.chronicAddOnAmount);
                 widget.policy.chronicAddOn = chronicAddOn;
 
-
+//                TODO: Offline storage of rating data, to implement offline calculation if device cannot access database
               }
               return SafeArea(
                 child: Stack(
@@ -413,7 +413,7 @@ class _DependentViewSummaryState extends State<DependentViewSummary> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
+      height: 212,
       //color: Theme.of(context).primaryColor,
       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 21.0),
       decoration: BoxDecoration(
@@ -770,7 +770,7 @@ class _DependantCardState extends State<DependantCard> {
                                 ),
                             ) :
                           FlatButton(
-                            onPressed: () {},
+                            onPressed: () => Navigator.pop(context),
                             color: Color(0xFF094451),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)) ,
                             child: Text(
@@ -798,59 +798,43 @@ class _DependantCardState extends State<DependantCard> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(8.0),
           ),
-          padding: EdgeInsets.all(21),
+          padding: EdgeInsets.symmetric(vertical: 2),
           child: Container(
             width: double.infinity,
-            child: Row(
+          child: ListTile(
+            leading:Image.asset(
+              'assets/images/${widget.dependent.package.toLowerCase()}.png',
+              width: 42,
+            ),
+            title: Text(
+              '${widget.dependent.firstName} ${widget.dependent.surname}',
+              overflow: TextOverflow.fade,
+              softWrap: false,
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
+            ),
+            subtitle: Text(
+              '${widget.dependent.idNumber}',
+              style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0),
+            ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Flexible(
-                  flex: 1,
-                  child: Image.asset('assets/images/${widget.dependent.package.toLowerCase()}.png'),
+                Text(
+                  '\$${widget.dependent.monthlyPremium}',
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
+                  style: TextStyle(fontSize: 18.0, ),
                 ),
-                SizedBox(width: 10,),
-                Flexible(
-                  flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          '${widget.dependent.firstName} ${widget.dependent.surname}',
-                          overflow: TextOverflow.fade,
-                          softWrap: false,
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w700),
-                        ),
-                        Text(
-                          '${widget.dependent.idNumber} | ${DateFormat.yMMMd("en_US").format(widget.dependent.dob)}',
-                          style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0),
-                        ),
-                      ],
-                    ),
+                Text(
+                  '${ widget.dependent.monthlyPremium + widget.dependent.joiningFeeAmount + widget.dependent.chronicAddOnAmount }',
+                  style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0),
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
                 ),
-                SizedBox(width: 10,),
-                Spacer(),
-                Flexible(
-                  flex: 2,
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        '\$${widget.dependent.monthlyPremium}',
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        style: TextStyle(fontSize: 18.0, ),
-                      ),
-                      Text(
-                        'J:\$${widget.dependent.joiningFeeAmount} | C:\$${widget.dependent.chronicAddOnAmount}',
-                        style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 14.0),
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
 
-                      ),
-                    ],
-                  ),
-
-                ),
               ],
             ),
+          ),
           ),
         ),
 

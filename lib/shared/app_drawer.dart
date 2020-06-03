@@ -1,3 +1,4 @@
+import 'package:access_agent/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:access_agent/screens/view_policy/policy_search.dart';
 
@@ -7,6 +8,9 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+
+  final AuthService _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -20,7 +24,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 Padding(
                   padding: EdgeInsets.only(top: 10.0),
                   child: FlatButton.icon(
-                      onPressed: null,
+                      onPressed: () => Navigator.pop(context),
                       icon: Icon(
                           Icons.arrow_back,
                           color: Color(0xFF094451),
@@ -33,29 +37,44 @@ class _AppDrawerState extends State<AppDrawer> {
 
                         ),
                       ),
-                    color: Colors.black,
+//                    color: Colors.black,
                   ),
                 ),
                 buildMenuItem(
-                  Icons.people_outline,
-                  "VIEW POLICY",
+                  Icons.done_outline,
+                  "ACTIVE POLICIES",
                   onTouch: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => ViewPolicySearchView())
                   )
-                    
                 ),
                 Divider(),
-                buildMenuItem(Icons.compare_arrows, "TRANSFER"),
+                  buildMenuItem(Icons.edit, "QUOTATIONS"),
                 Divider(),
-                buildMenuItem(Icons.receipt, "STATEMENTS"),
+                buildMenuItem(
+                  Icons.attach_money,
+                  "PAYMENTS",
+                  onTouch: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ViewPolicySearchView())
+                  )
+                ),
                 Divider(),
-                buildMenuItem(Icons.attach_money, "PAYMENTS"),
+                buildMenuItem(
+                  Icons.supervisor_account,
+                  "AFFILIATES",
+                  opacity: 0.2
+                ),
                 Divider(),
-                buildMenuItem(Icons.sentiment_satisfied, "INVESTMENTS"),
+                buildMenuItem(Icons.receipt, "COMMISION STATEMENTS", opacity: 0.2),
                 Divider(),
-                buildMenuItem(Icons.phone, "SUPPORT"),
-                Divider()
+                buildMenuItem(Icons.phone, "SUPPORT", opacity: 0.2),
+                Divider(),
+                buildMenuItem(
+                    Icons.person_outline,
+                    'LOG OUT',
+                    onTouch: () => _auth.signOut()
+                )
 
               ],
             ),
@@ -67,7 +86,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
 
   Widget buildMenuItem(IconData icon, String title,
-      {double opacity = 0.9, VoidCallback onTouch,} ) {
+      {double opacity = 0.8, VoidCallback onTouch,} ) {
     return InkWell(
       child: Opacity(
         opacity: opacity,

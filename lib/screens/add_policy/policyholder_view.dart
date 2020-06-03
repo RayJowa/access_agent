@@ -6,7 +6,11 @@ import 'package:access_agent/screens/add_policy/add_dependent_view.dart';
 import 'package:access_agent/screens/add_policy/dependents_view.dart';
 import 'package:access_agent/screens/add_policy/policyholder_to_dependent_view.dart';
 import 'package:access_agent/shared/constants.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart';
 import 'package:intl/intl.dart';
 
 class AddPolicyPolicyholderView extends StatefulWidget {
@@ -16,6 +20,7 @@ class AddPolicyPolicyholderView extends StatefulWidget {
 
 class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
 
+  final _formKey = GlobalKey<FormState>();
   final Policy policy = Policy();
 
   TextEditingController _titleController = TextEditingController();
@@ -57,9 +62,9 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
   @override
   void initState() {
     super.initState();
-    _nameController.addListener(() => policy.firstName = _nameController.text);
-    _surnameController.addListener(() => policy.surname = _surnameController.text);
-    _idController.addListener(() => policy.idNumber = _idController.text);
+    _nameController.addListener(() => policy.firstName = _nameController.text.toUpperCase());
+    _surnameController.addListener(() => policy.surname = _surnameController.text.toUpperCase());
+    _idController.addListener(() => policy.idNumber = _idController.text.toUpperCase());
     _emailController.addListener(() => policy.email = _emailController.text);
     _phoneController.addListener(() => policy.email = _emailController.text);
     policy.gender = 'Male';
@@ -103,6 +108,7 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
           ),
           padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
           child: Form(
+            key: _formKey,
               child: Column(
                 children: <Widget>[
                   TextFormField(
@@ -147,26 +153,42 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                       });
                     },
                   ),
-                  SizedBox(height: 20.0,),
+                  SizedBox(height: 16.0,),
                   TextFormField(
                     controller: _nameController,
+                    textCapitalization: TextCapitalization.characters,
+                    textInputAction: TextInputAction.next,
+                    validator: (name) {
+                      if (name.length < 2) {
+                        return 'Name should have at least two characters';
+                      }else{
+                        return null;
+                      }
+                    },
                     decoration: textInputDecoration.copyWith(
                       labelText: 'Name',
                       hintText: 'Name'
                     ),
                     style: InputTextStyle.inputText1(context),
                   ),
-                  SizedBox(height: 20.0,),
+                  SizedBox(height: 16.0,),
                   TextFormField(
                     controller: _surnameController,
+                    textCapitalization: TextCapitalization.characters,
+                    validator: (name) {
+                      if (name.length < 2) {
+                        return 'Name should have at least two characters';
+                      }else{
+                        return null;
+                      }
+                    },
                     decoration: textInputDecoration.copyWith(
                         labelText: 'Surname',
                         hintText: 'Surname'
                     ),
                     style: InputTextStyle.inputText1(context),
                   ),
-                  SizedBox(height: 10.0,),
-
+                  SizedBox(height: 16.0,),
                   Container(
                     padding: EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
                     decoration: BoxDecoration(
@@ -236,106 +258,176 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                     style: InputTextStyle.inputText1(context),
                     readOnly: true,
                     onTap: () {
-                      showDatePicker(
-                          context: context,
-                          initialDate: DateTime(DateTime.now().year - 30),
-                          firstDate: DateTime(DateTime.now().year - 100),
-                          lastDate: DateTime(DateTime.now().year-18)
-                      ).then((date) {
-                        setState(() {
-                          policy.dob = date;
+
+                      DatePicker.showDatePicker(
+                        context,
+
+                        minDateTime: DateTime(DateTime.now().year - 100),
+                        maxDateTime: DateTime(DateTime.now().year-18),
+                        initialDateTime: DateTime(DateTime.now().year - 30),
+                        dateFormat: 'yyyy-MMM-d',
+                        pickerTheme: DateTimePickerTheme(
+                          showTitle: true,
+                          confirm: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Color(0xFF094451),
+                            ),
+
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            child: Text(
+                              'Confirm',
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                              ),
+                            )
+                          ),
+                          cancel: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.redAccent,
+                              ),
+
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              )
+                          ),
+
+                          itemTextStyle: InputTextStyle.inputText2(context)
+                        ),
+                        onConfirm: (dateTime, List<int> index) {
+                          policy.dob = dateTime;
                           _dobController.text = DateFormat.yMMMMd("en_US").format(policy.dob);
                           print(_dobController.text);
-                        });
-                      }
+                        }
                       );
                     },
                   ),
-
-                  SizedBox(height: 20,),
+                  SizedBox(height: 16,),
                   TextFormField(
                     controller: _idController,
+                    textCapitalization: TextCapitalization.characters,
+                    textInputAction: TextInputAction.next,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(14),
+                      WhitelistingTextInputFormatter(RegExp('([0-9A-Z-])')),
+                    ],
+                    validator: (name) {
+                      if (name.length < 10) {
+                        return 'Invalid ID number';
+                      }else{
+                        return null;
+                      }
+                    },
                     decoration: textInputDecoration.copyWith(
                         labelText: 'ID number',
                         hintText: 'ID number'
                     ),
                     style: InputTextStyle.inputText1(context),
                   ),
-                  SizedBox(height: 20.0,),
+                  SizedBox(height: 16.0,),
                   TextFormField(
                     controller: _phoneController,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(10)
+                    ],
                     keyboardType: TextInputType.phone,
                     decoration: textInputDecoration.copyWith(
                         labelText: 'Phone number',
                         hintText: 'Phone number'
                     ),
+                    validator: (name) {
+                      if (name.length < 9) {
+                        return 'Invalid phone number';
+                      }else{
+                        return null;
+                      }
+                    },
+                    textInputAction: TextInputAction.next,
                     style: InputTextStyle.inputText1(context),
                   ),
-                  SizedBox(height: 20.0,),
+                  SizedBox(height: 16.0,),
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    validator: (email) => EmailValidator.validate(email) ?
+                      null : 'Invalid email address',
                     decoration: textInputDecoration.copyWith(
                         labelText: 'Email',
                         hintText: 'Email'
                     ),
                     style: InputTextStyle.inputText1(context),
                   ),
-                  SizedBox(height: 20.0,),
-
+                  SizedBox(height: 16.0,),
 
                   FlatButton(
                     onPressed: () async {
-                      PreviousMedAid _previousMedAid = PreviousMedAid();
 
-                      policy.firstName = _nameController.text;
-                      policy.surname = _surnameController.text;
-                      policy.title = _titleController.text;
-                      policy.idNumber = _idController.text;
-                      policy.phone = _phoneController.text;
-                      policy.email = _emailController.text;
-                      policy.dependents = [];
-                      policy.previousMedAid = _previousMedAid;
+                      if (_formKey.currentState.validate()) {
+                        PreviousMedAid _previousMedAid = PreviousMedAid();
+
+                        policy.firstName = _nameController.text.toUpperCase();
+                        policy.surname = _surnameController.text.toUpperCase();
+                        policy.title = _titleController.text;
+                        policy.idNumber = _idController.text.toUpperCase();
+                        policy.phone = _phoneController.text;
+                        policy.email = _emailController.text;
+                        policy.dependents = [];
+                        policy.previousMedAid = _previousMedAid;
 
 
-                      if (policy.dependents.length <= 0) {
-                        Dependent dep = Dependent(
+                        if (policy.dependents.length <= 0) {
+                          Dependent dep = Dependent(
                             firstName: policy.firstName,
                             surname: policy.surname,
                             idNumber: policy.idNumber,
-                            dob: policy.dob
-                        );
+                            dob: policy.dob,
+                            gender: policy.gender
 
-                        policy.dependents.add(dep);
+                          );
+
+                          policy.dependents.add(dep);
 
 
-                        dynamic result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) =>
-                                PolicyholderToDependantView(dependent: dep, policy: policy,))
-                        );
+                          dynamic result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) =>
+                                  PolicyholderToDependantView(
+                                    dependent: dep, policy: policy,))
+                          );
 
-                        if (result != null) {
-                          policy.dependents[0] = result;
+                          if (result != null) {
+                            policy.dependents[0] = result;
+
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>
+                                    AddPolicyDependentsView(policy: policy,))
+                            );
+                          }
                         }
                       }
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) =>
-                                AddPolicyDependentsView(policy: policy,))
-                        );
-
-
                     },
                     
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
-                      child: Text(
-                          'Next',
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          color: Colors.grey[500],
-                          fontWeight: FontWeight.w700
+                    child: SizedBox(
+                      height: 50,
+                      width: 200,
+                      child: Center(
+                        child: Text(
+                            'Next',
+                          style: TextStyle(
+                            fontSize: 25.0,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w700
+                          ),
                         ),
                       ),
                     ),

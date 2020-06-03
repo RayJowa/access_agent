@@ -32,21 +32,6 @@ class _HomeState extends State<Home> {
     return Scaffold(
       key: _scafoldKey,
       backgroundColor: Colors.grey[200],
-//      appBar: AppBar(
-//        title: Text('Access'),
-//        backgroundColor: Colors.blue,
-//        elevation: 0.0,
-//        actions: <Widget>[
-//          FlatButton.icon(
-//              onPressed: () async {
-//                await _auth.signOut();
-//              },
-//              icon: Icon(Icons.person),
-//              label: Text('Logout')
-//          ),
-//
-//        ],
-//      ),
       drawer: AppDrawer(),
       body:FutureBuilder(
         future: DatabaseService(uid: user.uid).getAgentData(),
@@ -185,7 +170,8 @@ class _HomeState extends State<Home> {
                                           //TODO: Reset monthly counter every month
                                           '\$${snapshot
                                               .data['monthCommission'] != null
-                                              ? snapshot.data['monthCommission']
+                                              ? snapshot
+                                              .data['monthCommission']
                                               .toString()
                                               : '0' }',
                                           style: TextStyle(
@@ -216,15 +202,18 @@ class _HomeState extends State<Home> {
 //                          crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: <Widget>[
                                   SmallBox('Policies',
-                                      '${snapshot.data['activePolicies'] != null
+                                      '${snapshot.data['activePolicies'] !=
+                                          null
                                           ? snapshot.data['activePolicies']
                                           .toString()
                                           : '0'}'
-                                          '/${snapshot.data['totalPolicies'] !=
-                                          null ? snapshot.data['totalPolicies']
+                                          '/${snapshot
+                                          .data['totalPolicies'] !=
+                                          null ? snapshot
+                                          .data['totalPolicies']
                                           .toString() : '0'}'),
                                   SmallBox('New this month', '12'),
-                                  SmallBox('Paid-up', '12/220')
+                                  SmallBox('Affiliates', '0')
                                 ],
                               ),
                             ),
@@ -262,7 +251,8 @@ class _HomeState extends State<Home> {
                                                     'See all',
                                                     style: TextStyle(
                                                         fontSize: 16,
-                                                        color: Colors.grey[400]
+                                                        color: Colors
+                                                            .grey[400]
                                                     ),
                                                   )
                                               )
@@ -290,7 +280,8 @@ class _HomeState extends State<Home> {
                                                               .all(10),
                                                           decoration: BoxDecoration(
                                                               borderRadius: BorderRadius
-                                                                  .circular(5),
+                                                                  .circular(
+                                                                  5),
                                                               color: index < 2
                                                                   ? Color(
                                                                   0xFF46737c)
@@ -298,8 +289,10 @@ class _HomeState extends State<Home> {
                                                                   .grey[300]
                                                           ),
                                                           child: Icon(
-                                                            Icons.mail_outline,
-                                                            color: Colors.white,
+                                                            Icons
+                                                                .mail_outline,
+                                                            color: Colors
+                                                                .white,
                                                           ),
                                                         ),
                                                         title: Text(
@@ -523,4 +516,61 @@ class _SmallBoxState extends State<SmallBox> {
     );
   }
 }
+
+class NotApproved extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage(
+                    'assets/images/background.png'),
+                fit: BoxFit.cover
+            )
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(21.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Welcome to the Access App',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+
+                ),
+              ),
+              SizedBox(height: 12,),
+              Text(
+                'Your registration has been received.  It is awaiting approval. '
+                    'Contact us on the details below for further assistance:',
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.w100,
+                  color: Colors.grey[300],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 12,),
+              Text(
+                'accesshealthmedicalfund@gmail.com',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey[300],
+                  fontSize: 25
+                )
+              )
+              ]
+            )
+          ),
+        ),
+      );
+
+  }
+}
+
 

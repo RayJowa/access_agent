@@ -218,6 +218,7 @@ class _AddPolicyEcocashPaymentViewState extends State<AddPolicyEcocashPaymentVie
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+
               Icon(
                 Icons.check_circle_outline,
                 color: Color(0xFF094451),
