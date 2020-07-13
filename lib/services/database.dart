@@ -1,9 +1,12 @@
 
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:access_agent/models/policy.dart';
+import 'package:access_agent/services/sms.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 
@@ -119,7 +122,7 @@ class DatabaseService {
       'totalPolicies': FieldValue.increment(1)
     });
 
-    return await policyCollection.add({
+    DocumentReference policy = await policyCollection.add({
       'title' : title,
       'firstName' : firstName,
       'surname' : surname,
@@ -140,8 +143,16 @@ class DatabaseService {
       'Agent Name': '${agent.data['firstName']} ${agent.data['surname']}',
       'accountBalance' : 0,
       'status': 'quote'
-
     });
+
+    String message = "Dear ${firstName[0].toUpperCase() + firstName.substring(1)} Welcome to Access Health Medical Fund.  Your policy will be activated when you pay your first premium";
+
+    Response response = await Sms(number: '077454579', message: message).sendSms();
+    Map data = jsonDecode(response.body);
+    print("sms DATA : ////////////////////////////////////////");
+    print(data);
+
+    return policy;
   }
 
 
@@ -207,6 +218,7 @@ class DatabaseService {
 
   Future addReceipt ({
     String receiptID,
+    String externalID,
     String policyID,
     String paymentMethod,
     double amount,
@@ -218,6 +230,7 @@ class DatabaseService {
 
     return receiptsCollection.add({
       'receiptID': receiptID,
+      'externalID': externalID,
       'policyID': policyID,
       'paymentMethod': paymentMethod,
       'amount': amount,

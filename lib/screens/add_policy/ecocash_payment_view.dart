@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:access_agent/models/policy.dart';
@@ -8,6 +10,8 @@ import 'package:access_agent/shared/dialogues.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class AddPolicyEcocashPaymentView extends StatefulWidget {
@@ -21,11 +25,15 @@ class AddPolicyEcocashPaymentView extends StatefulWidget {
 
 class _AddPolicyEcocashPaymentViewState extends State<AddPolicyEcocashPaymentView> {
 
+  final _formKey = GlobalKey<FormState>();
+
   TextEditingController _amountController = TextEditingController();
   TextEditingController _numberController = TextEditingController();
 
   String error = '';
   bool transactionSuccessful = false;
+  bool confirmationPending = false;
+  dynamic pollURL;
 
   @override
   Widget build(BuildContext context) {
@@ -116,20 +124,25 @@ class _AddPolicyEcocashPaymentViewState extends State<AddPolicyEcocashPaymentVie
     if (transactionSuccessful) {
       return Successful();
     }else {
-      return CaptureDetails(uid: uid);
+      if (confirmationPending) {
+        return retryTransaction(uid: uid);
+      }else {
+        return CaptureDetails(uid: uid);
+      }
     }
   }
   
   
   Widget CaptureDetails({String uid}) {
     return Form(
+      key: _formKey,
         child: Column(
           children: <Widget>[
             Text(
               error,
-              style: TextStyle(color: Colors.redAccent, fontSize: 14),
+              style: TextStyle(color: Colors.redAccent, fontSize: 18),
             ),
-            SizedBox(height: 10,),
+            SizedBox(height: 20,),
             TextFormField(
               controller: _amountController,
               decoration: textInputDecorationLight.copyWith(
@@ -145,47 +158,77 @@ class _AddPolicyEcocashPaymentViewState extends State<AddPolicyEcocashPaymentVie
               controller: _numberController,
               decoration: textInputDecorationLight.copyWith(
                 labelText: 'Phone number',
-                hintText: 'Phone number',
+                hintText: '07XXXXXXXX',
               ),
               style: InputTextStyle.inputText2(context),
               keyboardType: TextInputType.phone,
               textAlign: TextAlign.right,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(10),
+//                WhitelistingTextInputFormatter(RegExp(r'^07(7|8)\d{7}$'))
+                WhitelistingTextInputFormatter.digitsOnly
+              ],
+              validator: (phone) {
+                String pattern = r'^07(7|8)\d{7}$';
+                RegExp regExp = RegExp(pattern);
+
+                if (phone.length != 10) {
+                  return 'Invalid phone number';
+                } else if (!regExp.hasMatch(phone)) {
+                  return 'Please enter a valid Ecocash number';
+                } else {
+                  return null;
+                }
+              },
             ),
             SizedBox(height: 20.0),
             FlatButton(
               onPressed: () async {
+                if (_formKey.currentState.validate()) {
+                  Dialogs().paymentProcessing(context: context);
 
-                Dialogs().paymentProcessing(context: context);
-                await Future.delayed(Duration(seconds: 3));
-                Navigator.pop(context);
-                final random = Random();
+                  String transactionCode = "EC" + DateTime
+                      .now()
+                      .millisecondsSinceEpoch
+                      .toString();
+                  var url = 'http://rayzimnat.pythonanywhere.com/payment/';
 
-                if (random.nextBool()) {
-                  
-                  String code = 'ECO' + (random.nextInt(900000) + 100000).toString();
-
-                  DatabaseService(uid: uid).createFirstDebit(widget.policy);
-
-                  DocumentReference rec = await DatabaseService().addReceipt(
-                    receiptID: code,
-                    policyID: widget.policy.policyID,
-                    paymentMethod: 'ecocash',
-                    amount: double.parse(_amountController.text),
-                    datePaid: DateTime.now(),
-                    dateRecorded: DateTime.now(),
-                    unmatchedAmount: double.parse(_amountController.text),
-                  );
-
-                  DatabaseService(uid: uid).match(policyID: widget.policy.policyID, receiptID: rec.documentID);
-
-                  setState(() {
-                    transactionSuccessful = true;
+                  Response response = await post(url, body: {
+                    "payment_id": transactionCode,
+                    "amount": _amountController.text,
+                    "customer_number": _numberController.text,
+                    "customer_email": "rayzimnat@gmail.com",
+                    "description": "Test from flutter"
                   });
 
-                }else {
-                  setState(() {
-                    error = 'Transaction failed';
-                  });
+                  Map data = jsonDecode(response.body);
+                  print(
+                      "JASON DATA : O==O==O==O==O==O==O==O==O==O==O==O==O==O==O");
+                  print(data);
+                  print(data["status"]);
+
+                  if (data['status'] == 'paid') {
+                    recordReceipt(
+                        uid: uid,
+                        transactionCode: transactionCode,
+                        externalID: data['paynow_reference']
+                    );
+
+                    setState(() {
+                      transactionSuccessful = true;
+                    });
+                  } else if (data['status'] == 'sent') {
+                    //TODO create ui with cancel and check status and cancel buttons
+                    setState(() {
+                      confirmationPending = true;
+                      pollURL = data['url'];
+                    });
+                  } else {
+                    setState(() {
+                      error = data['status'];
+                    });
+                  }
+                  Navigator.pop(context);
                 }
               },
 
@@ -278,6 +321,133 @@ class _AddPolicyEcocashPaymentViewState extends State<AddPolicyEcocashPaymentVie
           ),
         ],
       );
+  }
+  
+  Widget retryTransaction({String uid}) {
+    return Column(
+      children: <Widget>[
+        Icon(
+          Icons.sentiment_neutral,
+          color: Color(0xFF094451),
+          size: 80,
+        ),
+        SizedBox(height: 20,),
+        Center(
+          child: Text(
+            'Transaction awaiting confirmation',
+            style: TextStyle(
+              fontSize: 24,
+              color: Color(0xFF094451),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(height: 25,),
+        FlatButton(
+          onPressed: () async {
+
+            Dialogs().paymentProcessing(context: context);
+
+            Response resp = await post(
+                'http://rayzimnat.pythonanywhere.com/status/',
+              body: {
+                  "url":pollURL
+              }
+            );
+            Map data = jsonDecode(resp.body);
+            print("JASON DATA : mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
+            print(data);
+
+            Navigator.pop(context);
+
+            if(data['status'] == 'paid') {
+              recordReceipt(
+                  uid: uid,
+                  transactionCode: data['reference'],
+                  externalID: data['paynow_reference']
+              );
+
+              setState(() {
+                transactionSuccessful = true;
+                confirmationPending = false;
+              });
+            } else if (data['status'] == 'sent') {
+
+            } else {
+              setState(() {
+                confirmationPending = false;
+                error = data['status'];
+              });
+            }
+          },
+          child: SizedBox(
+            height: 50,
+            width: 200,
+            child: Center(
+              child: Text(
+                'Check again',
+                style: TextStyle(
+                    fontSize: 25.0,
+                    color: Colors.grey[200],
+                    fontWeight: FontWeight.w700
+                ),
+              ),
+            ),
+          ),
+          color: Color(0xFF094451),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)
+          ),
+        ),
+        SizedBox(height: 20.0),
+        FlatButton(
+          onPressed: () {
+
+          },
+          child: SizedBox(
+            height: 50,
+            width: 200,
+            child: Center(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                    fontSize: 25.0,
+                    color: Colors.grey[200],
+                    fontWeight: FontWeight.w700
+                ),
+              ),
+            ),
+          ),
+          color: Colors.redAccent,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)
+          ),
+        ),
+        SizedBox(height: 20.0),
+      ],
+    );
+  }
+
+  void recordReceipt({
+    String uid,
+    String transactionCode,
+    String externalID
+  }) async {
+    DatabaseService(uid: uid).createFirstDebit(widget.policy);
+
+    DocumentReference rec = await DatabaseService().addReceipt(
+      receiptID: transactionCode,
+      externalID: externalID,
+      policyID: widget.policy.policyID,
+      paymentMethod: 'ecocash',
+      amount: double.parse(_amountController.text),
+      datePaid: DateTime.now(),
+      dateRecorded: DateTime.now(),
+      unmatchedAmount: double.parse(_amountController.text),
+    );
+
+    DatabaseService(uid: uid).match(policyID: widget.policy.policyID, receiptID: rec.documentID);
+
   }
 }
 

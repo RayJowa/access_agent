@@ -344,8 +344,8 @@ class _AddPolicyPolicyholderViewState extends State<AddPolicyPolicyholderView> {
                         labelText: 'Phone number',
                         hintText: 'Phone number'
                     ),
-                    validator: (name) {
-                      if (name.length < 9) {
+                    validator: (phone) {
+                      if (phone.length < 9) {
                         return 'Invalid phone number';
                       }else{
                         return null;
