@@ -1,9 +1,12 @@
+import 'package:access_agent/models/user.dart';
 import 'package:access_agent/screens/view_policy/policy_detail.dart';
 import 'package:access_agent/screens/view_policy/policy_list.dart';
 import 'package:access_agent/services/database.dart';
 import 'package:access_agent/shared/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
 class ViewPolicySearchView extends StatefulWidget {
@@ -21,6 +24,8 @@ class _ViewPolicySearchViewState extends State<ViewPolicySearchView> {
 
   @override
   Widget build(BuildContext context) {
+
+    final user = Provider.of<User>(context);
 
 //    String barcode = '';
     Future scanBarcode() async {
@@ -94,6 +99,7 @@ class _ViewPolicySearchViewState extends State<ViewPolicySearchView> {
 //                                  SizedBox(height: 20.0,),
                                   TextFormField(
                                     controller: _surnameController,
+                                    textCapitalization: TextCapitalization.characters,
                                     decoration: textInputDecorationLight.copyWith(
                                       labelText: 'Surname',
                                       hintText: 'Surname',
@@ -103,6 +109,7 @@ class _ViewPolicySearchViewState extends State<ViewPolicySearchView> {
                                   SizedBox(height: 20.0,),
                                   TextFormField(
                                     controller: _IDController,
+                                    textCapitalization: TextCapitalization.characters,
                                     decoration: textInputDecorationLight.copyWith(
                                       labelText: 'ID Number',
                                       hintText: 'ID Number',
@@ -122,8 +129,9 @@ class _ViewPolicySearchViewState extends State<ViewPolicySearchView> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (BuildContext context) => ViewPolicyListView(
-                                  surname: _surnameController.text ?? '',
-                                  idNumber: _IDController.text ?? '',
+                                  surname: _surnameController.text.toUpperCase() ?? '',
+                                  idNumber: _IDController.text.toUpperCase() ?? '',
+                                  agentID: user.uid,
                                 ))
                             );
                           },

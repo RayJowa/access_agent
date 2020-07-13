@@ -156,7 +156,14 @@ class DatabaseService {
   }
 
 
-  getPolicies({int perPage, DocumentSnapshot startAfter, String surname, String idNumber, String status = 'active'}) async {
+  getPolicies({
+    int perPage,
+    DocumentSnapshot startAfter,
+    String surname,
+    String idNumber,
+    String status = 'active',
+    String agentID
+  }) async {
 
     Query q;
     String endSurname = surname + 'z';
@@ -173,6 +180,7 @@ class DatabaseService {
             .where('surname', isGreaterThanOrEqualTo: surname)
             .where('surname', isLessThanOrEqualTo: endSurname)
             .where('status', isEqualTo: status)
+            .where('agentID', isEqualTo: agentID )
             .orderBy('surname')
             .limit(perPage);
       } else {
@@ -180,6 +188,7 @@ class DatabaseService {
             .where('surname', isGreaterThanOrEqualTo: surname)
             .where('surname', isLessThanOrEqualTo: endSurname)
             .where('status', isEqualTo: status)
+            .where('agentID', isEqualTo: agentID )
             .orderBy('surname')
             .startAfterDocument(startAfter)
             .limit(perPage);
@@ -191,6 +200,7 @@ class DatabaseService {
             .where('surname', isLessThanOrEqualTo: endSurname)
             .where('idNumber', isEqualTo: idNumber)
             .where('status', isEqualTo: status)
+            .where('agentID', isEqualTo: agentID )
             .orderBy('surname')
             .limit(perPage);
       } else {
@@ -199,6 +209,7 @@ class DatabaseService {
             .where('surname', isLessThanOrEqualTo: endSurname)
             .where('idNumber', isEqualTo: idNumber)
             .where('status', isEqualTo: status)
+            .where('agentID', isEqualTo: agentID )
             .orderBy('surname')
             .startAfterDocument(startAfter)
             .limit(perPage);

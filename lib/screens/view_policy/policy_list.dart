@@ -1,15 +1,20 @@
 
+import 'package:access_agent/models/user.dart';
 import 'package:access_agent/screens/view_policy/policy_detail.dart';
 import 'package:access_agent/services/database.dart';
 import 'package:access_agent/shared/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ViewPolicyListView extends StatefulWidget {
 
   final String surname;
   final String idNumber;
-  ViewPolicyListView({this.surname, this.idNumber});
+  final String agentID;
+
+  ViewPolicyListView({this.surname, this.idNumber, this.agentID});
+
 
   @override
   _ViewPolicyListViewState createState() => _ViewPolicyListViewState();
@@ -33,10 +38,13 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
       _loadingPolicies = true;
     });
 
+//    final user = Provider.of<User>(context);
+
     QuerySnapshot query = await DatabaseService().getPolicies(
       perPage: perPage,
       surname: widget.surname,
-      idNumber: widget.idNumber
+      idNumber: widget.idNumber,
+      agentID: widget.agentID
     );
 
     policies = query.documents;
@@ -53,7 +61,7 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
 
   _getMorePolicies() async {
 
-
+//    final user = Provider.of<User>(context);
 
     if (_morePoliciesAvailable == false) {
       //no more policies are available in the query, therefore exit function
@@ -70,7 +78,8 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
       perPage: perPage,
       startAfter: lastDocument,
       surname: widget.surname,
-      idNumber: widget.idNumber
+      idNumber: widget.idNumber,
+      agentID: widget.agentID
     );
 
     if (query.documents.length < perPage) {
@@ -91,6 +100,7 @@ class _ViewPolicyListViewState extends State<ViewPolicyListView> {
   @override
   void initState() {
     super.initState();
+
     _getPolicies();
     
     _scrollController.addListener(() {
