@@ -1,30 +1,38 @@
-import 'package:access_agent/models/policy.dart';
 import 'package:access_agent/models/user.dart';
+import 'package:access_agent/screens/view_policy/policy_detail.dart';
+import 'package:access_agent/screens/view_policy/policy_list.dart';
+import 'package:access_agent/screens/view_quote/quote_list.dart';
 import 'package:access_agent/services/database.dart';
-import 'package:access_agent/services/sms.dart';
 import 'package:access_agent/shared/constants.dart';
-import 'package:access_agent/shared/dialogues.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
-class AddPolicyCashPaymentView extends StatefulWidget {
-
-  final Policy policy;
-  AddPolicyCashPaymentView({this.policy});
-
+class ViewQuoteSearchView extends StatefulWidget {
   @override
-  _AddPolicyCashPaymentViewState createState() => _AddPolicyCashPaymentViewState();
+  _ViewQuoteSearchViewState createState() => _ViewQuoteSearchViewState();
 }
 
-class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
+class _ViewQuoteSearchViewState extends State<ViewQuoteSearchView> {
 
-  TextEditingController _amountController = TextEditingController();
+//  TextEditingController _policyNumberController = TextEditingController();
+  TextEditingController _surnameController = TextEditingController();
+  TextEditingController _IDController = TextEditingController();
+
+  String errorText = '';
 
   @override
   Widget build(BuildContext context) {
 
     final user = Provider.of<User>(context);
+
+//    String barcode = '';
+    Future scanBarcode() async {
+      String barcode = await scanner.scan();
+      return barcode;
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).accentColor,
@@ -36,7 +44,7 @@ class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
                   right: 0,
                   left: 0,
                   child: Container(
-                    height: 220,
+                    height: 160,
                     padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 21.0),
                     decoration: BoxDecoration(
                         image: DecorationImage(
@@ -50,33 +58,20 @@ class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
                       children: <Widget>[
                         FittedBox(
                           child: Text(
-                            '${widget.policy.firstName} ${widget.policy.surname}',
+                            'Search Quotation',
                             style: Theme.of(context).textTheme.headline4.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
                             overflow: TextOverflow.fade,
                           ),
                         ),
                         Divider(height: 20,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Column(
-                              children: <Widget>[
-                                Text('Premium due', style: Theme.of(context).textTheme.subtitle1,),
-                                SizedBox(height: 6.0,),
-                                Text('\$${(widget.policy.basicPremium + widget.policy.joiningFee + widget.policy.chronicAddOn).toString()}', style: Theme.of(context).textTheme.headline5,),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Divider(height: 20,),
-                        Text('Cash payment', style: Theme.of(context).textTheme.headline6,),
+                        Text('Enter quotation details', style: Theme.of(context).textTheme.headline6,),
                       ],
                     ),
 
                   )
               ),
               Positioned (
-                top: 170,
+                top: 100,
                 bottom: 0,
                 left: 0,
                 right: 0,
@@ -94,60 +89,60 @@ class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
                           child: Form(
                               child: Column(
                                 children: <Widget>[
+//                                  TextFormField(
+//                                    controller: _policyNumberController,
+//                                    decoration: textInputDecorationLight.copyWith(
+//                                      labelText: 'Policy number',
+//                                      hintText: 'Policy number',
+//                                    ),
+//                                    style: InputTextStyle.inputText2(context),
+//                                  ),
+//                                  SizedBox(height: 20.0,),
                                   TextFormField(
-                                    controller: _amountController,
+                                    controller: _surnameController,
+                                    textCapitalization: TextCapitalization.characters,
                                     decoration: textInputDecorationLight.copyWith(
-                                      labelText: 'Amount',
-                                      hintText: 'Enter amount',
+                                      labelText: 'Surname',
+                                      hintText: 'Surname',
                                     ),
                                     style: InputTextStyle.inputText2(context),
-                                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                    textAlign: TextAlign.right,
                                   ),
+                                  SizedBox(height: 20.0,),
+                                  TextFormField(
+                                    controller: _IDController,
+                                    textCapitalization: TextCapitalization.characters,
+                                    decoration: textInputDecorationLight.copyWith(
+                                      labelText: 'ID Number',
+                                      hintText: 'ID Number',
+                                    ),
+                                    style: InputTextStyle.inputText2(context),
+                                  ),
+                                  SizedBox(height: 20.0,),
 
-                              ],
+                                ],
                               )
                           ),
                         ),
                         SizedBox(height: 20.0),
                         FlatButton(
-                          onPressed: () async {
+                          onPressed: () {
 
-                            Dialogs().paymentProcessing(context: context);
-                            String transactionCode = "CA" + DateTime
-                                .now()
-                                .millisecondsSinceEpoch
-                                .toString();
-                            
-                            DatabaseService(uid: user.uid).createFirstDebit(widget.policy);
-
-                            DocumentReference rec = await DatabaseService().addReceipt(
-                              receiptID: transactionCode,
-                              externalID: 'cash',
-                              policyID: widget.policy.policyID,
-                              paymentMethod: 'cash',
-                              amount: double.parse(_amountController.text),
-                              datePaid: DateTime.now(),
-                              dateRecorded: DateTime.now(),
-                              unmatchedAmount: double.parse(_amountController.text)
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (BuildContext context) => ViewQuoteListView(
+                                  surname: _surnameController.text.toUpperCase() ?? '',
+                                  idNumber: _IDController.text.toUpperCase() ?? '',
+                                  agentID: user.uid,
+                                ))
                             );
-
-                            Sms(
-                              number: widget.policy.phone,
-                              message: "Premium received. \nYour receipt number is $transactionCode, \nAmount ${_amountController.text}"
-                            ).sendSms();
-
-                            DatabaseService(uid: user.uid).match(policyID: widget.policy.policyID, receiptID: rec.documentID);
-
-                            Navigator.pop(context);
                           },
- 
+
                           child: SizedBox(
-                            height: 50,
                             width: 200,
+                            height: 60,
                             child: Center(
                               child: Text(
-                                'Pay',
+                                'Search',
                                 style: TextStyle(
                                     fontSize: 25.0,
                                     color: Colors.grey[200],
@@ -160,7 +155,8 @@ class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)
                           ),
-                        )
+                        ),
+                        SizedBox(height: 20,),
                       ],
                     ),
 
@@ -170,6 +166,10 @@ class _AddPolicyCashPaymentViewState extends State<AddPolicyCashPaymentView> {
             ],
           )
       ),
+
+
     );
   }
+
+
 }

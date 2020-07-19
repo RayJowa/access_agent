@@ -68,11 +68,15 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
                     e.chronicAddOnAmount =
                         snapshot.data[e.package.toLowerCase()]['chronic']
                             .toDouble();
+                  }else{
+                    e.chronicAddOnAmount = 0.0;
                   }
 
                   if (e.joiningFee) {
                     e.joiningFeeAmount = snapshot.data[e.package
                         .toLowerCase()]['joining_individual'].toDouble();
+                  }else{
+                    e.joiningFeeAmount = 0.0;
                   }
 
                 });
@@ -338,14 +342,17 @@ class _AddPolicyDependentsViewState extends State<AddPolicyDependentsView> {
                                   );
                                 },
 
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
-                                  child: Text(
-                                    'Next',
-                                    style: TextStyle(
-                                        fontSize: 25.0,
-                                        color: Colors.grey[200],
-                                        fontWeight: FontWeight.w700
+                                child: SizedBox(
+                                  height: 50,
+                                  width: 200,
+                                  child: Center(
+                                    child: Text(
+                                      'Next',
+                                      style: TextStyle(
+                                          fontSize: 25.0,
+                                          color: Colors.grey[200],
+                                          fontWeight: FontWeight.w700
+                                      ),
                                     ),
                                   ),
                                 ),

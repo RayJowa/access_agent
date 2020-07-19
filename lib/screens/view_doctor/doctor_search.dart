@@ -107,7 +107,7 @@ class _AddPolicyDoctorViewState extends State<AddPolicyDoctorView> {
             ),
             FlatButton(
               onPressed: () {
-                Navigator.pop(context, {'docName' : _doctorController.text, 'docId': docId});
+                Navigator.popUntil(context, (route) => route.isFirst);
               },
               child: SizedBox(
                 height: 50,

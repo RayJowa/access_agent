@@ -2,7 +2,7 @@ import 'package:http/http.dart';
 
 class Sms {
 
-  final String number;
+  final dynamic number;
   final String message;
   Sms({this.number, this.message});
 

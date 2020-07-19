@@ -279,6 +279,13 @@ class DatabaseService {
       agentCollection.document(uid).updateData({
         'activePolicies': FieldValue.increment(1)
       });
+
+      Sms(
+        number: policy.phone,
+        message: "Dear ${policy.firstName.toLowerCase()[0].toUpperCase() + policy.firstName.toLowerCase().substring(1)},\n"
+            "Welcome to Access Health Medical fund.  Your policy is now active"
+      ).sendSms();
+
     }
   }
 

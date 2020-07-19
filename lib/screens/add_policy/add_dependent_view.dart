@@ -124,7 +124,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                   textCapitalization: TextCapitalization.characters,
                   validator: (name) {
                     if (name.length < 2) {
-                      return 'Name should have at least two characters';
+                      return 'Surname should have at least two characters';
                     }else{
                       return null;
                     }
@@ -385,6 +385,7 @@ class _AddPolicyAddDependentViewState extends State<AddPolicyAddDependentView> {
                                   dependent.joiningFee = selected;
                                 });
                               },
+
                             ),
                             InputChip(
                               padding: EdgeInsets.all(6.0),

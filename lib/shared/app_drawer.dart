@@ -1,4 +1,7 @@
+import 'package:access_agent/screens/add_policy/doctor_view.dart';
+import 'package:access_agent/screens/view_quote/quote_search.dart';
 import 'package:access_agent/services/auth.dart';
+import 'package:access_agent/services/sms.dart';
 import 'package:flutter/material.dart';
 import 'package:access_agent/screens/view_policy/policy_search.dart';
 
@@ -49,7 +52,15 @@ class _AppDrawerState extends State<AppDrawer> {
                   )
                 ),
                 Divider(),
-                  buildMenuItem(Icons.edit, "QUOTATIONS"),
+                  buildMenuItem(
+                    Icons.edit,
+                    "QUOTATIONS",
+                    onTouch: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ViewQuoteSearchView())
+                    )
+                  ),
+
                 Divider(),
                 buildMenuItem(
                   Icons.attach_money,
@@ -66,9 +77,15 @@ class _AppDrawerState extends State<AppDrawer> {
                   opacity: 0.2
                 ),
                 Divider(),
-                buildMenuItem(Icons.receipt, "COMMISION STATEMENTS", opacity: 0.2, onTouch: () {print('ECO' + DateTime.now().millisecondsSinceEpoch.toString());}),
+                buildMenuItem(Icons.receipt, "COMMISSION STATEMENTS", opacity: 0.2, onTouch: () {print('ECO' + DateTime.now().millisecondsSinceEpoch.toString());}),
                 Divider(),
-                buildMenuItem(Icons.phone, "SUPPORT", opacity: 0.2),
+                buildMenuItem(
+                  Icons.person_add,
+                  "DOCTORS",
+                  onTouch: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AddPolicyDoctorView()))
+
+
+                ),
                 Divider(),
                 buildMenuItem(
                     Icons.person_outline,

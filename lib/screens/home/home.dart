@@ -237,7 +237,7 @@ class _HomeState extends State<Home> {
                                             children: <Widget>[
                                               SizedBox(width: 15,),
                                               Text(
-                                                'Notifications',
+                                                'Top agents',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 22,
@@ -268,145 +268,43 @@ class _HomeState extends State<Home> {
                                                   itemBuilder: (
                                                       BuildContext context,
                                                       int index) {
-                                                    return Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 2.0),
-                                                      child: ListTile(
-                                                        leading: Container(
-                                                          padding: EdgeInsets
-                                                              .all(6),
-                                                          margin: EdgeInsets
-                                                              .all(10),
-                                                          decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius
-                                                                  .circular(
-                                                                  5),
-                                                              color: index < 2
-                                                                  ? Color(
-                                                                  0xFF46737c)
-                                                                  : Colors
-                                                                  .grey[300]
-                                                          ),
-                                                          child: Icon(
-                                                            Icons
-                                                                .mail_outline,
-                                                            color: Colors
-                                                                .white,
-                                                          ),
-                                                        ),
-                                                        title: Text(
-                                                          'Welcome to access',
-                                                          style: TextStyle(
-                                                              fontWeight: FontWeight
-                                                                  .w700,
-                                                              color: index < 2
-                                                                  ? Color(
-                                                                  0xFF46737c)
-                                                                  : Colors
-                                                                  .grey[400]
-                                                          ),
+                                                    return ListTile(
+                                                      leading: Container(
+                                                        padding: EdgeInsets
+                                                            .all(6),
+                                                        margin: EdgeInsets
+                                                            .all(8),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius
+                                                                .circular(
+                                                                5),
+                                                            color: Color(0xFF46737c)
 
                                                         ),
-                                                        subtitle: Text(
-                                                            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, enim hic."
+                                                        child: Icon(
+                                                          Icons
+                                                              .person,
+                                                          color: Colors
+                                                              .white,
                                                         ),
-                                                        onTap: () {
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (
-                                                                  BuildContext context) {
-                                                                return Dialog(
-
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius
-                                                                          .circular(
-                                                                          12.0)
-                                                                  ),
-                                                                  child: InkWell(
-                                                                    onTap: () =>
-                                                                        Navigator
-                                                                            .pop(
-                                                                            context),
-                                                                    child: Container(
-                                                                      decoration: BoxDecoration(
-                                                                        borderRadius: BorderRadius
-                                                                            .circular(
-                                                                            13.0),
-                                                                      ),
-                                                                      width: 320.0,
-                                                                      height: 320,
-                                                                      child: Column(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          Container(
-                                                                            width: double
-                                                                                .infinity,
-                                                                            height: 50,
-                                                                            alignment: Alignment
-                                                                                .bottomCenter,
-                                                                            decoration: BoxDecoration(
-                                                                              color: Color(
-                                                                                  0xFF094451),
-                                                                              borderRadius: BorderRadius
-                                                                                  .only(
-                                                                                  topLeft: Radius
-                                                                                      .circular(
-                                                                                      12),
-                                                                                  topRight: Radius
-                                                                                      .circular(
-                                                                                      12)
-                                                                              ),
-                                                                            ),
-                                                                            child: Align(
-                                                                              alignment: Alignment
-                                                                                  .center,
-                                                                              child: Text(
-                                                                                'Welcome to access medical fund' ??
-                                                                                    '',
-                                                                                overflow: TextOverflow
-                                                                                    .fade,
-                                                                                style: TextStyle(
-                                                                                    color: Colors
-                                                                                        .white,
-                                                                                    fontSize: 22,
-                                                                                    fontWeight: FontWeight
-                                                                                        .bold
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                          Container(
-                                                                            padding: EdgeInsets
-                                                                                .symmetric(
-                                                                                horizontal: 10.0,
-                                                                                vertical: 5.0),
-                                                                            child: Row(
-                                                                              children: <
-                                                                                  Widget>[
-                                                                                Flexible(
-                                                                                  child: Text(
-                                                                                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. In iaculis nunc sed augue lacus viverra.  ',
-                                                                                    style: TextStyle(
-                                                                                        height: 2,
-                                                                                        fontSize: 20
-                                                                                    ),
-                                                                                  ),
-                                                                                )
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
-
-                                                                );
-                                                              }
-                                                          );
-                                                        },
+                                                      ),
+                                                      title: Text(
+                                                        'Tinashe',
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight
+                                                                .w700,
+                                                            color: Color(0xFF46737c)
+                                                        ),
 
                                                       ),
+                                                      subtitle: Text(
+                                                          "Policies: 45"
+                                                      ),
+
+                                                      trailing: Text(
+                                                          "\$256"
+                                                      ),
+
                                                     );
                                                   }
                                               ),

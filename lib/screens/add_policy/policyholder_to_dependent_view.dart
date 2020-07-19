@@ -265,14 +265,17 @@ class _PolicyholderToDependantViewState extends State<PolicyholderToDependantVie
                             Navigator.pop(context, widget.dependent);
 
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 80.0),
-                            child: Text(
-                              'Save',
-                              style: TextStyle(
-                                  fontSize: 25.0,
-                                  color: Colors.grey[200],
-                                  fontWeight: FontWeight.w700
+                          child: SizedBox(
+                            height: 50,
+                            width: 200,
+                            child: Center(
+                              child: Text(
+                                'Save',
+                                style: TextStyle(
+                                    fontSize: 25.0,
+                                    color: Colors.grey[200],
+                                    fontWeight: FontWeight.w700
+                                ),
                               ),
                             ),
                           ),
